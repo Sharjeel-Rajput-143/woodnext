@@ -2869,3 +2869,117 @@ button.adm-stat:hover {
     transform: none;
   }
 }
+
+/* Admin: product rows open a details page inside the panel */
+.adm-row-open {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.adm-row-thumb {
+  display: block;
+  line-height: 0;
+  border-radius: 12px;
+}
+button.adm-cell-main:hover strong {
+  text-decoration: underline;
+}
+.adm-row-open:focus-visible,
+.adm-recent-item:focus-visible {
+  outline: 2px solid var(--accent, currentColor);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+.adm-recent-item {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  cursor: pointer;
+}
+.adm-recent-item:hover strong {
+  text-decoration: underline;
+}
+.adm-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+}
+.adm-detail-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 14px;
+  background: var(--sand);
+}
+.adm-detail-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+.adm-detail-body h2 {
+  margin: 0;
+  color: var(--heading);
+  overflow-wrap: anywhere;
+}
+.adm-detail-body p {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.adm-detail-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.adm-detail-specs li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.adm-detail-specs svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.adm-detail-meta {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 0;
+}
+.adm-detail-meta dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.adm-detail-meta dd {
+  margin: 2px 0 0;
+  color: var(--heading);
+  overflow-wrap: anywhere;
+}
+@media (min-width: 860px) {
+  .adm-detail {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: start;
+  }
+}

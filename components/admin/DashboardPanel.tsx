@@ -3,6 +3,7 @@
 import type { StorageMode } from "@/lib/catalog";
 import type { StoredCatalog } from "@/lib/products";
 import { youtubeThumb } from "@/lib/youtube";
+import imageLoader from "@/lib/image-loader";
 import AdmIcon, { type AdmIconName } from "./AdmIcons";
 
 export type View = "dashboard" | "products" | "categories" | "videos";
@@ -27,11 +28,13 @@ export default function DashboardPanel({
   mode,
   go,
   onAdd,
+  onOpenProduct,
 }: {
   catalog: StoredCatalog;
   mode: StorageMode;
   go: (view: View) => void;
   onAdd: (kind: "product" | "category" | "video") => void;
+  onOpenProduct: (id: string) => void;
 }) {
   const counts = catalog.categories.map((c) => ({
     category: c,
@@ -120,12 +123,14 @@ export default function DashboardPanel({
             <ul className="adm-recent">
               {recent.map((product) => (
                 <li key={product.id}>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- admin thumbnail */}
-                  <img src={product.image} alt="" loading="lazy" />
-                  <span>
-                    <strong>{product.title}</strong>
-                    <small>{label(product.category)}</small>
-                  </span>
+                  <button type="button" className="adm-recent-item" onClick={() => onOpenProduct(product.id)}>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- admin thumbnail */}
+                    <img src={imageLoader({ src: product.image, width: 160 })} alt="" loading="lazy" />
+                    <span>
+                      <strong>{product.title}</strong>
+                      <small>{label(product.category)}</small>
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>

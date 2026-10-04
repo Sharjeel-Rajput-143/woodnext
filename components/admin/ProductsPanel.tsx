@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { StoredCatalog, StoredProduct } from "@/lib/products";
 import type { Actions } from "./actions";
+import imageLoader from "@/lib/image-loader";
 import AdmIcon from "./AdmIcons";
 
 export default function ProductsPanel({
@@ -10,6 +11,7 @@ export default function ProductsPanel({
   saving,
   actions,
   onAdd,
+  onOpen,
   onEdit,
   onDelete,
 }: {
@@ -17,6 +19,7 @@ export default function ProductsPanel({
   saving: boolean;
   actions: Actions;
   onAdd: (category?: string) => void;
+  onOpen: (product: StoredProduct) => void;
   onEdit: (product: StoredProduct) => void;
   onDelete: (product: StoredProduct) => void;
 }) {
@@ -70,15 +73,17 @@ export default function ProductsPanel({
             const at = siblings.findIndex((p) => p.id === product.id);
             return (
               <div className="adm-tr" key={product.id}>
-                {/* eslint-disable-next-line @next/next/no-img-element -- admin thumbnail */}
-                <img className="adm-thumb" src={product.image} alt="" loading="lazy" />
-                <span className="adm-cell-main">
+                <button type="button" className="adm-row-open adm-row-thumb" onClick={() => onOpen(product)} aria-label={`Open ${product.title}`} tabIndex={-1}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- admin thumbnail */}
+                  <img className="adm-thumb" src={imageLoader({ src: product.image, width: 160 })} alt="" loading="lazy" />
+                </button>
+                <button type="button" className="adm-row-open adm-cell-main" onClick={() => onOpen(product)}>
                   <strong>{product.title}</strong>
                   <small>
                     <span className="adm-show-sm">{label(product.category)} · </span>
                     {product.id}
                   </small>
-                </span>
+                </button>
                 <span className="adm-hide-sm">
                   <span className="adm-chip">{label(product.category)}</span>
                 </span>
@@ -96,9 +101,9 @@ export default function ProductsPanel({
                   >
                     <AdmIcon name="down" />
                   </button>
-                  <a className="adm-iconbtn" href={`/p/${product.id}`} target="_blank" rel="noopener noreferrer" aria-label="View on website" title="View on website">
+                  <button type="button" className="adm-iconbtn" aria-label="View details" title="View details" onClick={() => onOpen(product)}>
                     <AdmIcon name="eye" />
-                  </a>
+                  </button>
                   <button type="button" className="adm-iconbtn" aria-label="Edit" title="Edit" disabled={saving} onClick={() => onEdit(product)}>
                     <AdmIcon name="edit" />
                   </button>

@@ -12,6 +12,7 @@ import CategoriesPanel from "./CategoriesPanel";
 import CategoryForm from "./CategoryForm";
 import DashboardPanel, { type View } from "./DashboardPanel";
 import Modal from "./Modal";
+import ProductDetail from "./ProductDetail";
 import ProductForm from "./ProductForm";
 import ProductsPanel from "./ProductsPanel";
 import VideoForm from "./VideoForm";
@@ -61,6 +62,7 @@ export default function AdminApp({
   const [catalog, setCatalog] = useState(initialCatalog);
   const [mode, setMode] = useState(initialMode);
   const [view, setView] = useState<View>("dashboard");
+  const [detailId, setDetailId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<Toast>(null);
@@ -114,6 +116,14 @@ export default function AdminApp({
 
   function open(next: View) {
     setView(next);
+    setDetailId(null);
+    setMenuOpen(false);
+    showToast(null);
+  }
+
+  function openProduct(id: string) {
+    setView("products");
+    setDetailId(id);
     setMenuOpen(false);
     showToast(null);
   }
@@ -130,7 +140,11 @@ export default function AdminApp({
   }
 
   const askDeleteProduct = (p: StoredProduct) =>
-    ask("Delete product", `Delete “${p.title}”? This cannot be undone.`, () => actions.removeProduct(p.id));
+    ask("Delete product", `Delete “${p.title}”? This cannot be undone.`, async () => {
+      const ok = await actions.removeProduct(p.id);
+      if (ok) setDetailId(null);
+      return ok;
+    });
   const askDeleteCategory = (c: Category) => {
     const n = catalog.products.filter((p) => p.category === c.id).length;
     ask(
@@ -151,7 +165,8 @@ export default function AdminApp({
   }
 
   const closeEditor = () => setEditor(null);
-  const head = HEAD[view];
+  const detail = view === "products" && detailId ? catalog.products.find((p) => p.id === detailId) : undefined;
+  const head = detail ? { title: detail.title, subtitle: "Product details" } : HEAD[view];
   const badge = BADGE[mode];
 
   return (
@@ -224,13 +239,24 @@ export default function AdminApp({
               to turn saving on. You can still look around.
             </p>
           )}
-          {view === "dashboard" && <DashboardPanel catalog={catalog} mode={mode} go={open} onAdd={(kind) => add(kind)} />}
-          {view === "products" && (
+          {view === "dashboard" && <DashboardPanel catalog={catalog} mode={mode} go={open} onAdd={(kind) => add(kind)} onOpenProduct={openProduct} />}
+          {detail && (
+            <ProductDetail
+              product={detail}
+              catalog={catalog}
+              saving={saving}
+              onBack={() => setDetailId(null)}
+              onEdit={(item) => setEditor({ kind: "product", item })}
+              onDelete={askDeleteProduct}
+            />
+          )}
+          {view === "products" && !detail && (
             <ProductsPanel
               catalog={catalog}
               saving={saving}
               actions={actions}
               onAdd={(category) => add("product", category)}
+              onOpen={(item) => setDetailId(item.id)}
               onEdit={(item) => setEditor({ kind: "product", item })}
               onDelete={askDeleteProduct}
             />

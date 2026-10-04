@@ -1,21 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
-import { CATEGORIES, categoryLabel, productsByCategory } from "@/lib/products";
-import { ArrowIcon, CategoryIcon, CheckIcon, WhatsAppIcon } from "./Icons";
+import { productsByCategory } from "@/lib/products";
+import CategoryTabs from "./CategoryTabs";
+import { ArrowIcon, WhatsAppIcon } from "./Icons";
 import ProductImage from "./ProductImage";
-import { useShop } from "./ShopProvider";
+import { scrollToProducts, useShop } from "./ShopProvider";
 import WhatsAppLink from "./WhatsAppLink";
 
 const MAX_SLIDES = 6;
-const AUTOPLAY_MS = 5000;
+const AUTOPLAY_MS = 5500;
 const SWIPE_PX = 45;
 
-const POINTS = ["Solid, seasoned wood", "Made to your exact size", "Free design advice on WhatsApp"];
-
 /**
- * Split hero: copy on the left, auto-playing image carousel on the right.
- * The carousel shows the products of the selected category.
+ * Full-screen slider. It shows the products of the selected category tab and auto-plays.
  */
 export default function Hero() {
   const { category, select } = useShop();
@@ -50,111 +48,68 @@ export default function Hero() {
   }
 
   return (
-    <section className="hero" id="top">
-      <div className="container hero-grid">
-        <div className="hero-copy">
-          <p className="eyebrow">Handcrafted · Made to measure</p>
-          <h1>
-            Wood furniture that fits your home <em>perfectly</em>
-          </h1>
-          <p className="lead">
-            Beds, kitchens and doors built by skilled carpenters. Pick a design, tap{" "}
-            <strong>Get Price</strong> and we&rsquo;ll reply on WhatsApp.
-          </p>
+    <section
+      className="hero"
+      id="top"
+      aria-roledescription="carousel"
+      aria-label="Featured designs"
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={() => (swipeStart.current = null)}
+    >
+      <h1 className="sr-only">Custom wood beds, kitchens and doors. Get the price on WhatsApp.</h1>
 
-          <div className="hero-cats" role="group" aria-label="Choose a category">
-            {CATEGORIES.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                className={`cat-chip${c.id === category ? " is-active" : ""}`}
-                aria-pressed={c.id === category}
-                onClick={() => select(c.id)}
-              >
-                <CategoryIcon id={c.id} className="cat-chip-icon" />
-                {c.name}
-              </button>
-            ))}
-          </div>
-
-          <div className="hero-cta">
-            <a href="#shop" className="btn btn-primary btn-lg">
-              Browse designs
-              <ArrowIcon className="btn-icon" />
-            </a>
-            <WhatsAppLink className="btn btn-outline btn-lg">
-              <WhatsAppIcon className="btn-icon" />
-              Chat on WhatsApp
-            </WhatsAppLink>
-          </div>
-
-          <ul className="hero-points">
-            {POINTS.map((point) => (
-              <li key={point}>
-                <CheckIcon className="point-icon" />
-                {point}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div
-          className="hero-visual"
-          role="region"
-          aria-roledescription="carousel"
-          aria-label="Featured designs"
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onPointerCancel={() => (swipeStart.current = null)}
-        >
-          <div className="hero-frame">
-            {slides.map((product, i) => {
-              const active = i === index;
-              return (
-                <div
-                  key={product.id}
-                  className={`slide${active ? " is-active" : ""}`}
-                  role="group"
-                  aria-roledescription="slide"
-                  aria-label={`${i + 1} of ${count}`}
-                  aria-hidden={!active}
-                  inert={!active}
-                >
-                  <ProductImage
-                    src={product.image}
-                    alt={product.title}
-                    sizes="(min-width: 960px) 600px, 100vw"
-                    priority={i === 0}
-                  />
-                  <div className="slide-card">
-                    <div className="slide-card-text">
-                      <span className="slide-card-cat">{categoryLabel(product.category)}</span>
-                      <span className="slide-card-title">{product.title}</span>
-                    </div>
-                    <WhatsAppLink product={product} className="btn btn-wa btn-sm">
+      <div className="hero-stage">
+        {slides.map((product, i) => {
+          const active = i === index;
+          return (
+            <div
+              key={product.id}
+              className={`slide${active ? " is-active" : ""}`}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${i + 1} of ${count}`}
+              aria-hidden={!active}
+              inert={!active}
+            >
+              <ProductImage src={product.image} alt={product.title} sizes="100vw" priority={i === 0} />
+              <div className="slide-shade" />
+              <div className="container slide-inner">
+                <div className="slide-copy">
+                  <h2 className="slide-title">{product.title}</h2>
+                  <p className="slide-desc">{product.description}</p>
+                  <ul className="slide-specs">
+                    {product.specs.slice(0, 3).map((spec) => (
+                      <li key={spec}>{spec}</li>
+                    ))}
+                  </ul>
+                  <div className="slide-actions">
+                    <WhatsAppLink product={product} className="btn btn-wa btn-lg">
                       <WhatsAppIcon className="btn-icon" />
                       Get Price
                     </WhatsAppLink>
+                    <button type="button" className="btn btn-glass btn-lg" onClick={scrollToProducts}>
+                      View all designs
+                      <ArrowIcon className="btn-icon" />
+                    </button>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-
-          {count > 1 && (
-            <div className="dots">
-              {slides.map((product, i) => (
-                <button
-                  key={product.id}
-                  type="button"
-                  className={`dot${i === index ? " is-active" : ""}`}
-                  aria-label={`Show ${product.title}`}
-                  aria-current={i === index}
-                  onClick={() => go(i)}
-                />
-              ))}
+              </div>
             </div>
-          )}
+          );
+        })}
+      </div>
+
+      <div className="hero-bottom">
+        <div className="container hero-bottom-inner">
+          <CategoryTabs
+            idPrefix="hero"
+            variant="glass"
+            value={category}
+            onChange={select}
+            controls="products-panel"
+          />
+
         </div>
       </div>
     </section>

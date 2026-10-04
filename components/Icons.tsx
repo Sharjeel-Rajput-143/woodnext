@@ -18,6 +18,14 @@ export function WhatsAppIcon({ className }: IconProps) {
   );
 }
 
+export function ChevronIcon({ className, direction }: IconProps & { direction: "left" | "right" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
+      <path d={direction === "left" ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7"} />
+    </svg>
+  );
+}
+
 export function SearchIcon({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
@@ -35,18 +43,17 @@ export function CloseIcon({ className }: IconProps) {
   );
 }
 
-export function ArrowIcon({ className }: IconProps) {
+export function HeartIcon({ className, filled }: IconProps & { filled?: boolean }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  );
-}
-
-export function CheckIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" {...stroke} strokeWidth={2.4} aria-hidden="true" focusable="false">
-      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      {...stroke}
+      fill={filled ? "currentColor" : "none"}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M12 20.5s-7.5-4.6-9.2-9.4A5.2 5.2 0 0 1 12 6.6a5.2 5.2 0 0 1 9.2 4.5c-1.7 4.8-9.2 9.4-9.2 9.4z" />
     </svg>
   );
 }
@@ -64,6 +71,14 @@ export function MoonIcon({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
       <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z" />
+    </svg>
+  );
+}
+
+export function ArrowIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
+      <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
 }

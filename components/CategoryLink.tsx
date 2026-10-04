@@ -2,9 +2,9 @@
 
 import type { ReactNode } from "react";
 import type { CategoryId } from "@/lib/products";
-import { scrollToShop, useShop } from "./ShopProvider";
+import { scrollToProducts, useShop } from "./ShopProvider";
 
-/** Button that switches category and jumps to the shop (used in the footer). */
+/** Button that switches category and jumps to the product list (used in the footer). */
 export default function CategoryLink({
   id,
   className,
@@ -21,7 +21,7 @@ export default function CategoryLink({
       className={className}
       onClick={() => {
         select(id);
-        scrollToShop();
+        scrollToProducts();
       }}
     >
       {children}

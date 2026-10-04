@@ -218,9 +218,6 @@ export default function AdminApp({
           </div>
           <div className="adm-head-actions">
             <ThemeToggle />
-            <span className="adm-avatar" title="Owner" aria-hidden="true">
-              O
-            </span>
           </div>
         </header>
 

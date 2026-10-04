@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { SITE } from "@/lib/site";
 import { LogoMark } from "../Icons";
+import AdmIcon from "./AdmIcons";
 
 export default function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,7 +39,7 @@ export default function LoginForm() {
 
   return (
     <main className="adm-login">
-      <form className="adm-login-card" onSubmit={onSubmit}>
+      <form className="adm-login-card" method="post" onSubmit={onSubmit}>
         <div className="adm-login-brand">
           <LogoMark className="logo-mark" />
           <span>{SITE.brand}</span>
@@ -50,7 +52,23 @@ export default function LoginForm() {
         </label>
         <label className="adm-field">
           <span>Password</span>
-          <input name="password" type="password" autoComplete="current-password" required />
+          <span className="adm-pass">
+            <input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              className="adm-pass-toggle"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
+              onClick={() => setShowPassword((v) => !v)}
+            >
+              <AdmIcon name={showPassword ? "eyeOff" : "eye"} />
+            </button>
+          </span>
         </label>
         {error && (
           <p className="adm-alert adm-alert-error" role="alert">

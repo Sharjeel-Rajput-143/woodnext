@@ -1,25 +1,53 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { StorageMode } from "@/lib/catalog";
-import type { StoredCatalog } from "@/lib/products";
+import type { Category, StoredCatalog, StoredProduct, Video } from "@/lib/products";
+import { LogoMark } from "../Icons";
+import ThemeToggle from "../ThemeToggle";
+import { createActions } from "./actions";
+import AdmIcon, { type AdmIconName } from "./AdmIcons";
 import CategoriesPanel from "./CategoriesPanel";
+import CategoryForm from "./CategoryForm";
+import DashboardPanel, { type View } from "./DashboardPanel";
+import Modal from "./Modal";
+import ProductForm from "./ProductForm";
 import ProductsPanel from "./ProductsPanel";
+import VideoForm from "./VideoForm";
 import VideosPanel from "./VideosPanel";
 
-type Tab = "products" | "categories" | "videos";
 type Toast = { kind: "ok" | "error"; text: string } | null;
+type Editor =
+  | { kind: "product"; item: StoredProduct | null; category?: string }
+  | { kind: "category"; item: Category | null }
+  | { kind: "video"; item: Video | null }
+  | null;
+type Confirm = { title: string; message: string; run: () => Promise<boolean> } | null;
 
 export type Commit = (next: StoredCatalog, successText: string) => Promise<boolean>;
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: "products", label: "Products" },
-  { id: "categories", label: "Categories & navigation" },
-  { id: "videos", label: "Videos" },
+const NAV: { id: View; label: string; icon: AdmIconName }[] = [
+  { id: "dashboard", label: "Dashboard", icon: "dashboard" },
+  { id: "products", label: "Products", icon: "products" },
+  { id: "categories", label: "Categories", icon: "categories" },
+  { id: "videos", label: "Videos", icon: "videos" },
 ];
 
-/** The owner's control panel: add, edit, delete and re-order products, categories and videos. */
+const HEAD: Record<View, { title: string; subtitle: string }> = {
+  dashboard: { title: "Dashboard", subtitle: "Overview of your website" },
+  products: { title: "Products", subtitle: "Add, edit and re-order your designs" },
+  categories: { title: "Categories & navigation", subtitle: "These are the tabs on your website" },
+  videos: { title: "Videos", subtitle: "YouTube videos shown on your website" },
+};
+
+const BADGE: Record<StorageMode, { text: string; kind: string }> = {
+  github: { text: "Saves to GitHub", kind: "info" },
+  file: { text: "Saves locally", kind: "ok" },
+  readonly: { text: "Read-only", kind: "warn" },
+};
+
+/** The owner's control panel: sidebar, header and pages for products, categories (navigation) and videos. */
 export default function AdminApp({
   initialCatalog,
   initialMode,
@@ -32,13 +60,25 @@ export default function AdminApp({
   const router = useRouter();
   const [catalog, setCatalog] = useState(initialCatalog);
   const [mode, setMode] = useState(initialMode);
-  const [tab, setTab] = useState<Tab>("products");
+  const [view, setView] = useState<View>("dashboard");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<Toast>(null);
+  const [editor, setEditor] = useState<Editor>(null);
+  const [confirm, setConfirm] = useState<Confirm>(null);
+
+  // Success messages hide themselves; errors stay until dismissed.
+  useEffect(() => {
+    if (toast?.kind !== "ok") return;
+    const timer = setTimeout(() => setToast(null), 4500);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const showToast = setToast;
 
   const commit: Commit = async (next, successText) => {
     setSaving(true);
-    setToast(null);
+    showToast(null);
     try {
       const res = await fetch("/api/admin/catalog", {
         method: "PUT",
@@ -55,20 +95,54 @@ export default function AdminApp({
         return false;
       }
       if (!res.ok || !data.catalog) {
-        setToast({ kind: "error", text: data.error ?? "Could not save. Please try again." });
+        showToast({ kind: "error", text: data.error ?? "Could not save. Please try again." });
         return false;
       }
       setCatalog(data.catalog);
       if (data.mode) setMode(data.mode);
-      setToast({ kind: "ok", text: successText });
+      showToast({ kind: "ok", text: successText });
       return true;
     } catch {
-      setToast({ kind: "error", text: "Network error. Please try again." });
+      showToast({ kind: "error", text: "Network error. Please try again." });
       return false;
     } finally {
       setSaving(false);
     }
   };
+
+  const actions = createActions(catalog, commit);
+
+  function open(next: View) {
+    setView(next);
+    setMenuOpen(false);
+    showToast(null);
+  }
+
+  function add(kind: "product" | "category" | "video", category?: string) {
+    setMenuOpen(false);
+    if (kind === "product") setEditor({ kind, item: null, category });
+    else if (kind === "category") setEditor({ kind, item: null });
+    else setEditor({ kind, item: null });
+  }
+
+  function ask(title: string, message: string, run: () => Promise<boolean>) {
+    setConfirm({ title, message, run });
+  }
+
+  const askDeleteProduct = (p: StoredProduct) =>
+    ask("Delete product", `Delete “${p.title}”? This cannot be undone.`, () => actions.removeProduct(p.id));
+  const askDeleteCategory = (c: Category) => {
+    const n = catalog.products.filter((p) => p.category === c.id).length;
+    ask(
+      "Delete category",
+      n
+        ? `Delete “${c.label}” and its ${n} product${n === 1 ? "" : "s"}? This cannot be undone.`
+        : `Delete “${c.label}” from the navigation?`,
+      () => actions.removeCategory(c.id),
+    );
+  };
+  const askDeleteVideo = (v: Video) =>
+    ask("Remove video", `Remove “${v.title}” from the website?`, () => actions.removeVideo(v.id));
 
   async function logout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -76,60 +150,183 @@ export default function AdminApp({
     router.refresh();
   }
 
+  const closeEditor = () => setEditor(null);
+  const head = HEAD[view];
+  const badge = BADGE[mode];
+
   return (
     <div className="adm">
-      <header className="adm-bar">
-        <div className="adm-bar-inner">
-          <div className="adm-title">
+      <aside className={`adm-side${menuOpen ? " is-open" : ""}`} aria-label="Admin menu">
+        <div className="adm-side-brand">
+          <LogoMark className="logo-mark" />
+          <span>
             <strong>{brand}</strong>
-            <span>Owner panel</span>
-          </div>
-          <div className="adm-bar-actions">
-            <a href="/" target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-sm">
-              View site
-            </a>
-            <button type="button" className="btn btn-dark btn-sm" onClick={logout}>
-              Log out
-            </button>
-          </div>
+            <small>Owner panel</small>
+          </span>
         </div>
-      </header>
 
-      <main className="adm-main">
-        {mode === "readonly" && (
-          <p className="adm-alert adm-alert-warn">
-            Changes can&rsquo;t be saved on this host yet. Add GITHUB_TOKEN in the hosting settings (or
-            connect a database) to turn saving on. You can still look around.
-          </p>
-        )}
-        {mode === "github" && (
-          <p className="adm-alert adm-alert-info">
-            Changes are saved to GitHub. The live site updates about a minute after each save.
-          </p>
-        )}
-
-        <nav className="adm-tabs" aria-label="Sections">
-          {TABS.map((t) => (
+        <nav className="adm-nav" aria-label="Sections">
+          <span className="adm-nav-label">Manage</span>
+          {NAV.map((item) => (
             <button
-              key={t.id}
+              key={item.id}
               type="button"
-              className={`adm-tab${tab === t.id ? " is-active" : ""}`}
-              aria-current={tab === t.id}
-              onClick={() => {
-                setTab(t.id);
-                setToast(null);
-              }}
+              className={`adm-nav-item${view === item.id ? " is-active" : ""}`}
+              aria-current={view === item.id ? "page" : undefined}
+              onClick={() => open(item.id)}
             >
-              {t.label}
-              <span className="adm-count">
-                {t.id === "products" ? catalog.products.length : t.id === "categories" ? catalog.categories.length : catalog.videos.length}
-              </span>
+              <AdmIcon name={item.icon} />
+              <span>{item.label}</span>
+              {item.id !== "dashboard" && (
+                <span className="adm-nav-count">
+                  {item.id === "products" ? catalog.products.length : item.id === "categories" ? catalog.categories.length : catalog.videos.length}
+                </span>
+              )}
             </button>
           ))}
         </nav>
 
-        {toast && (
-          <p className={`adm-alert ${toast.kind === "ok" ? "adm-alert-ok" : "adm-alert-error"}`} role="status">
+        <div className="adm-side-foot">
+          <a className="adm-nav-item" href="/" target="_blank" rel="noopener noreferrer">
+            <AdmIcon name="external" />
+            <span>View website</span>
+          </a>
+          <button type="button" className="adm-nav-item" onClick={logout}>
+            <AdmIcon name="logout" />
+            <span>Log out</span>
+          </button>
+        </div>
+      </aside>
+      {menuOpen && <button type="button" className="adm-scrim" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
+
+      <div className="adm-content">
+        <header className="adm-head">
+          <button type="button" className="adm-iconbtn adm-menu" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
+            <AdmIcon name="menu" />
+          </button>
+          <div className="adm-head-title">
+            <h1>{head.title}</h1>
+            <p>{head.subtitle}</p>
+          </div>
+          <div className="adm-head-actions">
+            <span className={`adm-badge adm-badge-${badge.kind}`}>{badge.text}</span>
+            <ThemeToggle />
+            <span className="adm-avatar" title="Owner" aria-hidden="true">
+              O
+            </span>
+          </div>
+        </header>
+
+        <main className="adm-main">
+          {mode === "readonly" && (
+            <p className="adm-alert adm-alert-warn">
+              Changes can&rsquo;t be saved on this host yet. Add GITHUB_TOKEN in the hosting settings (or connect a database)
+              to turn saving on. You can still look around.
+            </p>
+          )}
+          {view === "dashboard" && <DashboardPanel catalog={catalog} mode={mode} go={open} onAdd={(kind) => add(kind)} />}
+          {view === "products" && (
+            <ProductsPanel
+              catalog={catalog}
+              saving={saving}
+              actions={actions}
+              onAdd={(category) => add("product", category)}
+              onEdit={(item) => setEditor({ kind: "product", item })}
+              onDelete={askDeleteProduct}
+            />
+          )}
+          {view === "categories" && (
+            <CategoriesPanel
+              catalog={catalog}
+              saving={saving}
+              actions={actions}
+              onAdd={() => add("category")}
+              onEdit={(item) => setEditor({ kind: "category", item })}
+              onDelete={askDeleteCategory}
+            />
+          )}
+          {view === "videos" && (
+            <VideosPanel
+              catalog={catalog}
+              saving={saving}
+              actions={actions}
+              onAdd={() => add("video")}
+              onEdit={(item) => setEditor({ kind: "video", item })}
+              onDelete={askDeleteVideo}
+            />
+          )}
+        </main>
+      </div>
+
+      {editor?.kind === "product" && (
+        <Modal title={editor.item ? "Edit product" : "Add a product"} onClose={closeEditor}>
+          <ProductForm
+            initial={editor.item}
+            defaultCategory={editor.category}
+            catalog={catalog}
+            saving={saving}
+            onSave={async (product) => {
+              if (await actions.saveProduct(product)) closeEditor();
+            }}
+            onCancel={closeEditor}
+          />
+        </Modal>
+      )}
+      {editor?.kind === "category" && (
+        <Modal title={editor.item ? "Edit category" : "Add a category"} onClose={closeEditor} size="sm">
+          <CategoryForm
+            initial={editor.item}
+            catalog={catalog}
+            saving={saving}
+            onSave={async (category) => {
+              if (await actions.saveCategory(category)) closeEditor();
+            }}
+            onCancel={closeEditor}
+          />
+        </Modal>
+      )}
+      {editor?.kind === "video" && (
+        <Modal title={editor.item ? "Edit video" : "Add a video"} onClose={closeEditor} size="sm">
+          <VideoForm
+            initial={editor.item}
+            catalog={catalog}
+            saving={saving}
+            onSave={async (video) => {
+              if (await actions.saveVideo(video)) closeEditor();
+            }}
+            onCancel={closeEditor}
+          />
+        </Modal>
+      )}
+
+      {confirm && (
+        <Modal title={confirm.title} onClose={() => setConfirm(null)} size="sm">
+          <div className="adm-form">
+            <p>{confirm.message}</p>
+            <div className="adm-form-actions">
+              <button type="button" className="adm-btn" onClick={() => setConfirm(null)}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="adm-btn adm-btn-danger-solid"
+                disabled={saving}
+                onClick={async () => {
+                  await confirm.run();
+                  setConfirm(null);
+                }}
+              >
+                {saving ? "Deleting…" : "Delete"}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {toast && (
+        <div className={`adm-toast adm-toast-${toast.kind}`} role="status">
+          <AdmIcon name={toast.kind === "ok" ? "check" : "close"} />
+          <span>
             {toast.text}
             {toast.kind === "error" && toast.text.includes("Reload") && (
               <>
@@ -139,13 +336,12 @@ export default function AdminApp({
                 </button>
               </>
             )}
-          </p>
-        )}
-
-        {tab === "products" && <ProductsPanel catalog={catalog} commit={commit} saving={saving} />}
-        {tab === "categories" && <CategoriesPanel catalog={catalog} commit={commit} saving={saving} />}
-        {tab === "videos" && <VideosPanel catalog={catalog} commit={commit} saving={saving} />}
-      </main>
+          </span>
+          <button type="button" className="adm-toast-close" aria-label="Dismiss" onClick={() => setToast(null)}>
+            <AdmIcon name="close" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

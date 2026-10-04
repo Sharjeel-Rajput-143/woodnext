@@ -32,17 +32,11 @@ Only the owner can log in. Customers never see it. From the panel you can add, e
 
 Data lives in `data/catalog.json` (photos in `data/uploads/`).
 
-### Set up the login
+### Login
 
-Add these environment variables (locally in `.env.local`, on Vercel under Settings, Environment Variables):
-
-| Variable | What |
-| --- | --- |
-| `ADMIN_USERNAME` | Owner username |
-| `ADMIN_PASSWORD` | Owner password (use a long one) |
-| `SESSION_SECRET` | Random text, 32+ characters (signs the login cookie) |
-
-Then open `/admin`. Without these the login stays disabled (there is no default password).
+The owner login is built in (username `Waqar`; the password is stored only as a hash in `lib/auth.ts`).
+To use your own, set `ADMIN_USERNAME`, `ADMIN_PASSWORD` and `SESSION_SECRET` (random text, 32+ characters) as
+environment variables; they override the built-in login. Open `/admin` to sign in.
 
 ### Saving on Vercel
 
@@ -51,7 +45,7 @@ Vercel can't write files, so on Vercel the panel saves by committing `data/catal
 | Variable | What |
 | --- | --- |
 | `GITHUB_TOKEN` | A fine-grained token with **Contents: Read and write** on this repo only |
-| `GITHUB_REPO` | `owner/repo`, for example `Sharjeel-Rajput-143/woodnext` |
+| `GITHUB_REPO` | Optional. Defaults to `Sharjeel-Rajput-143/woodnext` |
 | `GITHUB_BRANCH` | Optional, defaults to `main` |
 
 Without them, Vercel shows the panel read-only. Running the site yourself (`npm run dev` / `npm start`) saves straight to the file.

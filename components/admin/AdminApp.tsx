@@ -98,7 +98,7 @@ export default function AdminApp({
       <main className="adm-main">
         {mode === "readonly" && (
           <p className="adm-alert adm-alert-warn">
-            Changes can&rsquo;t be saved on this host yet. Add GITHUB_TOKEN and GITHUB_REPO in the hosting settings (or
+            Changes can&rsquo;t be saved on this host yet. Add GITHUB_TOKEN in the hosting settings (or
             connect a database) to turn saving on. You can still look around.
           </p>
         )}

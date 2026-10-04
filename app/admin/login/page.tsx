@@ -1,10 +1,6 @@
-import { redirect } from "next/navigation";
 import LoginForm from "@/components/admin/LoginForm";
-import { adminConfigured, isAdmin } from "@/lib/auth";
 
-export const dynamic = "force-dynamic";
-
-export default async function LoginPage() {
-  if (await isAdmin()) redirect("/admin");
-  return <LoginForm configured={adminConfigured()} />;
+// Static page (served instantly from the CDN). Logged-in owners are sent to /admin after signing in.
+export default function LoginPage() {
+  return <LoginForm />;
 }

@@ -1,4 +1,4 @@
-import { adminConfigured, checkCredentials, createSession } from "@/lib/auth";
+import { checkCredentials, createSession } from "@/lib/auth";
 import { sameOrigin } from "@/lib/api-guard";
 
 // Best-effort brute-force protection (per server instance).
@@ -8,13 +8,6 @@ const MAX_ATTEMPTS = 8;
 
 export async function POST(request: Request) {
   if (!sameOrigin(request)) return Response.json({ error: "Forbidden." }, { status: 403 });
-  if (!adminConfigured()) {
-    return Response.json(
-      { error: "Admin login is not set up. Set ADMIN_USERNAME, ADMIN_PASSWORD and SESSION_SECRET." },
-      { status: 503 },
-    );
-  }
-
   const ip = (request.headers.get("x-forwarded-for") ?? "local").split(",")[0].trim();
   const now = Date.now();
   const record = attempts.get(ip);

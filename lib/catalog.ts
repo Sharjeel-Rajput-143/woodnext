@@ -17,9 +17,10 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const CATALOG_FILE = path.join(DATA_DIR, "catalog.json");
 const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
 const GH_CATALOG_PATH = "data/catalog.json";
+const DEFAULT_GITHUB_REPO = "Sharjeel-Rajput-143/woodnext";
 
 export function storageMode(): StorageMode {
-  if (process.env.GITHUB_TOKEN && process.env.GITHUB_REPO) return "github";
+  if (process.env.GITHUB_TOKEN) return "github";
   if (process.env.VERCEL) return "readonly";
   return "file";
 }
@@ -43,7 +44,7 @@ const EMPTY: StoredCatalog = {
 // ----------------------------------------------------------------------------- GitHub helpers
 function ghRepo() {
   return {
-    repo: process.env.GITHUB_REPO as string,
+    repo: process.env.GITHUB_REPO || DEFAULT_GITHUB_REPO,
     branch: process.env.GITHUB_BRANCH || "main",
     token: process.env.GITHUB_TOKEN as string,
   };
@@ -123,7 +124,7 @@ export async function saveCatalog(input: unknown, expectedRev: number): Promise<
   const mode = storageMode();
   if (mode === "readonly") {
     throw new CatalogError(
-      "Saving is not available on this host yet. Add GITHUB_TOKEN and GITHUB_REPO in the hosting settings, or connect a database.",
+      "Saving is not available on this host yet. Add GITHUB_TOKEN in the hosting settings, or connect a database.",
       501,
     );
   }

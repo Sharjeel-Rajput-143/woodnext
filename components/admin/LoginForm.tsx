@@ -5,7 +5,7 @@ import { useState, type FormEvent } from "react";
 import { SITE } from "@/lib/site";
 import { LogoMark } from "../Icons";
 
-export default function LoginForm({ configured }: { configured: boolean }) {
+export default function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -44,11 +44,6 @@ export default function LoginForm({ configured }: { configured: boolean }) {
         </div>
         <h1>Owner login</h1>
         <p className="adm-muted">Only the website owner can sign in here.</p>
-        {!configured && (
-          <p className="adm-alert adm-alert-warn">
-            Login is not set up yet. Add ADMIN_USERNAME, ADMIN_PASSWORD and SESSION_SECRET to the environment settings.
-          </p>
-        )}
         <label className="adm-field">
           <span>Username</span>
           <input name="username" autoComplete="username" required autoFocus />
@@ -62,7 +57,7 @@ export default function LoginForm({ configured }: { configured: boolean }) {
             {error}
           </p>
         )}
-        <button type="submit" className="btn btn-dark btn-block" disabled={busy || !configured}>
+        <button type="submit" className="btn btn-dark btn-block" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
         </button>
       </form>

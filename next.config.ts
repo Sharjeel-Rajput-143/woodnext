@@ -17,6 +17,18 @@ const nextConfig: NextConfig = {
   images: {
     loader: "custom",
     loaderFile: "./lib/image-loader.ts",
+    // Cap the largest photo at 1920px wide (the default goes up to 3840px, which is far bigger than needed).
+    deviceSizes: [360, 640, 828, 1080, 1280, 1600, 1920],
+    imageSizes: [96, 128, 256, 384],
+  },
+  async headers() {
+    const cache = "public, max-age=86400, stale-while-revalidate=604800";
+    return [
+      {
+        source: "/:file(logo-mark.png|icon.png|apple-icon.png|opengraph-image.jpg)",
+        headers: [{ key: "Cache-Control", value: cache }],
+      },
+    ];
   },
 };
 

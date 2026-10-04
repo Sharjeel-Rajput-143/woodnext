@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { preconnect } from "react-dom";
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
 import { SITE } from "@/lib/site";
@@ -34,6 +35,8 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  // Start the connection to the photo CDN while the page is still loading.
+  preconnect("https://images.unsplash.com");
   return (
     <html
       lang="en"

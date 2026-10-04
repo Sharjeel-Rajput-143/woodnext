@@ -22,20 +22,30 @@ export default function Hero() {
   const count = slides.length;
 
   // Index resets to the first slide whenever the category changes.
-  const [state, setState] = useState({ category, index: 0 });
-  const index = state.category === category ? state.index : 0;
+  // `reach` = how many slides have been needed so far. Photos are only loaded for slides up to `reach`
+  // (the shown slide plus the next one), instead of downloading all of them up front.
+  const [state, setState] = useState({ category, index: 0, reach: 1 });
+  const current = state.category === category ? state : { category, index: 0, reach: 1 };
+  const index = current.index;
+  const reach = current.reach;
   const swipeStart = useRef<number | null>(null);
 
-  const go = (to: number) => setState({ category, index: ((to % count) + count) % count });
+  const go = (to: number) => {
+    const next = ((to % count) + count) % count;
+    setState({ category, index: next, reach: Math.max(reach, next + 1) });
+  };
 
   useEffect(() => {
     if (count < 2) return;
     const timer = window.setTimeout(
-      () => setState({ category, index: (index + 1) % count }),
+      () => {
+        const next = (index + 1) % count;
+        setState({ category, index: next, reach: Math.max(reach, next + 1) });
+      },
       AUTOPLAY_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [category, index, count]);
+  }, [category, index, count, reach]);
 
   function onPointerDown(event: PointerEvent<HTMLElement>) {
     swipeStart.current = event.clientX;
@@ -89,7 +99,9 @@ export default function Hero() {
               aria-hidden={!active}
               inert={!active}
             >
-              <ProductImage src={product.image} alt={product.title} sizes="100vw" priority={i === 0} />
+              {i <= reach && (
+                <ProductImage src={product.image} alt={product.title} sizes="100vw" priority={i === 0} />
+              )}
               <div className="slide-shade" />
               <div className="container slide-inner">
                 <div className="slide-copy">

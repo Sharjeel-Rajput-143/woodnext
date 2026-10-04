@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { guardAdmin } from "@/lib/api-guard";
 import { CatalogError, getStoredCatalog, saveCatalog, storageMode } from "@/lib/catalog";
 
@@ -19,6 +20,8 @@ export async function PUT(request: Request) {
 
   try {
     const saved = await saveCatalog(body.catalog, expectedRev);
+    // Rebuild the pre-built pages with the new data (on Vercel the redeploy does this too).
+    revalidatePath("/", "layout");
     return Response.json({ catalog: saved, mode: storageMode() });
   } catch (error) {
     if (error instanceof CatalogError) return Response.json({ error: error.message }, { status: error.status });

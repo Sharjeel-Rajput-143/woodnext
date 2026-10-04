@@ -10,7 +10,11 @@ import { SITE } from "@/lib/site";
 
 type Props = { params: Promise<{ id: string }> };
 
-export const dynamic = "force-dynamic";
+// Pre-built for every product (new products are built on first visit). Cached on the CDN.
+export async function generateStaticParams() {
+  const { products } = await getCatalog();
+  return products.map((p) => ({ id: p.id }));
+}
 
 async function findProduct(id: string) {
   const { products } = await getCatalog();

@@ -60,3 +60,5 @@ Without them, Vercel shows the panel read-only. Running the site yourself (`npm 
 ## Deploy on Vercel
 
 Import the repo in Vercel (no settings needed). Optional env var `NEXT_PUBLIC_SITE_URL` = your live URL.
+
+> Saving from the owner panel on Vercel needs the `GITHUB_TOKEN` environment variable (see "Saving on Vercel" above).

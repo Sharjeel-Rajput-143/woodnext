@@ -358,3 +358,15 @@ export function searchProducts(query: string): Product[] {
     return words.every((w) => haystack.includes(w));
   });
 }
+
+/** Landscape crop of the product photo used for link previews (WhatsApp, Facebook). */
+export function ogImage(product: Product): string {
+  if (!product.image.startsWith("https://images.unsplash.com/")) return product.image;
+  const url = new URL(product.image);
+  url.searchParams.set("auto", "format");
+  url.searchParams.set("fit", "crop");
+  url.searchParams.set("w", "1200");
+  url.searchParams.set("h", "630");
+  url.searchParams.set("q", "70");
+  return url.toString();
+}

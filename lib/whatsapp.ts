@@ -25,6 +25,16 @@ function sourceLine(ad?: AdSource): string | null {
   return parts.length ? `Came from: ${parts.join(" / ")}` : null;
 }
 
+/**
+ * Link added to the message so the shop owner sees the product photo.
+ * With a site URL it points to the product page (WhatsApp shows a preview card with the photo);
+ * otherwise it falls back to the direct image URL.
+ */
+function productLink(product: Product): string | null {
+  if (SITE.url) return `${SITE.url.replace(/\/$/, "")}/p/${product.id}`;
+  return product.image.startsWith("http") ? product.image : null;
+}
+
 export function productWhatsappUrl(product: Product, ad?: AdSource): string {
   const lines = [
     `Hello ${SITE.brand}! 👋`,
@@ -36,7 +46,8 @@ export function productWhatsappUrl(product: Product, ad?: AdSource): string {
     `*Details:* ${product.description}`,
   ];
   if (product.specs.length) lines.push(`*Specs:* ${product.specs.join(", ")}`);
-  if (SITE.url) lines.push(`*Link:* ${SITE.url}/?tab=${product.category}`);
+  const link = productLink(product);
+  if (link) lines.push(`*Photo:* ${link}`);
   const source = sourceLine(ad);
   if (source) lines.push("", source);
   lines.push("", "Please share the price and availability. Thank you!");

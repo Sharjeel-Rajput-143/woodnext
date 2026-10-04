@@ -4,18 +4,22 @@ import { notFound } from "next/navigation";
 import { ArrowIcon, LogoMark, WhatsAppIcon } from "@/components/Icons";
 import ProductImage from "@/components/ProductImage";
 import WhatsAppLink from "@/components/WhatsAppLink";
-import { PRODUCTS, categoryLabel, ogImage } from "@/lib/products";
+import { getCatalog } from "@/lib/catalog";
+import { ogImage } from "@/lib/products";
 import { SITE } from "@/lib/site";
 
 type Props = { params: Promise<{ id: string }> };
 
-export function generateStaticParams() {
-  return PRODUCTS.map((p) => ({ id: p.id }));
+export const dynamic = "force-dynamic";
+
+async function findProduct(id: string) {
+  const { products } = await getCatalog();
+  return products.find((p) => p.id === id);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const product = PRODUCTS.find((p) => p.id === id);
+  const product = await findProduct(id);
   if (!product) return {};
   const title = `${product.title} | ${SITE.brand}`;
   const image = ogImage(product);
@@ -39,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  */
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
-  const product = PRODUCTS.find((p) => p.id === id);
+  const product = await findProduct(id);
   if (!product) notFound();
 
   return (
@@ -62,7 +66,7 @@ export default async function ProductPage({ params }: Props) {
           <ProductImage src={product.image} alt={product.title} sizes="(min-width: 860px) 640px, 100vw" priority />
         </div>
         <div className="pp-info">
-          <p className="eyebrow">{categoryLabel(product.category)}</p>
+          <p className="eyebrow">{product.categoryLabel}</p>
           <h1>{product.title}</h1>
           <p className="pp-desc">{product.description}</p>
           <ul className="pp-specs">

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { CategoryId } from "@/lib/products";
+import type { IconName } from "@/lib/products";
 
 type IconProps = { className?: string };
 
@@ -84,27 +84,62 @@ export function ArrowIcon({ className }: IconProps) {
   );
 }
 
-export function CategoryIcon({ id, className }: IconProps & { id: CategoryId }) {
+export function CategoryIcon({ icon, className }: IconProps & { icon: IconName }) {
   return (
     <svg className={className} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
-      {id === "bed" && (
+      {icon === "bed" && (
         <>
           <path d="M3 18V6M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5" />
           <circle cx="7" cy="11" r="1.6" />
         </>
       )}
-      {id === "kitchen" && (
+      {icon === "kitchen" && (
         <>
           <rect x="4" y="3" width="16" height="18" rx="2" />
           <path d="M4 9h16M8 6h.01M12 6h.01M16 6h.01M9 14h6" />
         </>
       )}
-      {id === "door" && (
+      {icon === "door" && (
         <>
           <rect x="6" y="3" width="12" height="18" rx="1" />
           <circle cx="15" cy="12.5" r=".8" fill="currentColor" />
         </>
       )}
+      {icon === "chair" && (
+        <>
+          <path d="M7 3h10v8H7zM6 11h12v4H6zM8 15v6M16 15v6" />
+        </>
+      )}
+      {icon === "sofa" && (
+        <>
+          <path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3zM6 18v2M18 18v2" />
+        </>
+      )}
+      {icon === "table" && (
+        <>
+          <path d="M3 8h18M5 8v12M19 8v12M5 12h14" />
+        </>
+      )}
+      {icon === "wardrobe" && (
+        <>
+          <rect x="4" y="3" width="16" height="18" rx="1.5" />
+          <path d="M12 3v18M9.5 12h.01M14.5 12h.01" />
+        </>
+      )}
+      {icon === "tag" && (
+        <>
+          <path d="M3 12V4h8l10 10-8 8z" />
+          <circle cx="7.5" cy="8.5" r="1.2" />
+        </>
+      )}
+    </svg>
+  );
+}
+
+export function PlayIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z" />
     </svg>
   );
 }

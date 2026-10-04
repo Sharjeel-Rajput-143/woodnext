@@ -1,31 +1,35 @@
 "use client";
 
 import type { KeyboardEvent } from "react";
-import { CATEGORIES, productsByCategory, type CategoryId } from "@/lib/products";
+import { productsByCategory } from "@/lib/products";
 import { CategoryIcon } from "./Icons";
+import { useShop } from "./ShopProvider";
 
 type Props = {
   /** Unique per instance: the page renders two synced tab bars (hero + products). */
   idPrefix: string;
   variant: "glass" | "light";
   /** `null` while a search / saved view is showing (no tab is active). */
-  value: CategoryId | null;
-  onChange: (id: CategoryId) => void;
+  value: string | null;
+  onChange: (id: string) => void;
   controls: string;
 };
 
 export default function CategoryTabs({ idPrefix, variant, value, onChange, controls }: Props) {
+  const { categories, products } = useShop();
+
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const current = Math.max(0, CATEGORIES.findIndex((c) => c.id === value));
+    const count = categories.length;
+    const current = Math.max(0, categories.findIndex((c) => c.id === value));
     let next = current;
-    if (event.key === "ArrowRight") next = (current + 1) % CATEGORIES.length;
-    else if (event.key === "ArrowLeft") next = (current - 1 + CATEGORIES.length) % CATEGORIES.length;
+    if (event.key === "ArrowRight") next = (current + 1) % count;
+    else if (event.key === "ArrowLeft") next = (current - 1 + count) % count;
     else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = CATEGORIES.length - 1;
+    else if (event.key === "End") next = count - 1;
     else return;
 
     event.preventDefault();
-    const id = CATEGORIES[next].id;
+    const id = categories[next].id;
     onChange(id);
     document.getElementById(`${idPrefix}-tab-${id}`)?.focus();
   }
@@ -37,7 +41,7 @@ export default function CategoryTabs({ idPrefix, variant, value, onChange, contr
       aria-label="Design categories"
       onKeyDown={handleKeyDown}
     >
-      {CATEGORIES.map((category, i) => {
+      {categories.map((category, i) => {
         const active = category.id === value;
         const focusable = active || (value === null && i === 0);
         return (
@@ -52,9 +56,9 @@ export default function CategoryTabs({ idPrefix, variant, value, onChange, contr
             className={`tab${active ? " is-active" : ""}`}
             onClick={() => onChange(category.id)}
           >
-            <CategoryIcon id={category.id} className="tab-icon" />
+            <CategoryIcon icon={category.icon} className="tab-icon" />
             <span className="tab-text">{category.label}</span>
-            <span className="tab-count">{productsByCategory(category.id).length}</span>
+            <span className="tab-count">{productsByCategory(products, category.id).length}</span>
           </button>
         );
       })}

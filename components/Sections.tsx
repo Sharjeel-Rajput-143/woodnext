@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { CATEGORIES, photo } from "@/lib/products";
+import { photo, type Category } from "@/lib/products";
 import { SITE } from "@/lib/site";
 import CategoryLink from "./CategoryLink";
 import { FeatureIcon, LogoMark, WhatsAppIcon, type FeatureIconName } from "./Icons";
@@ -152,7 +152,7 @@ export function CtaBand() {
   );
 }
 
-export function Footer() {
+export function Footer({ categories }: { categories: Category[] }) {
   return (
     <footer className="footer">
       <div className="container footer-grid">
@@ -167,7 +167,7 @@ export function Footer() {
         <div>
           <h4>Shop</h4>
           <ul>
-            {CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <li key={c.id}>
                 <CategoryLink id={c.id} className="footer-link">
                   {c.label}

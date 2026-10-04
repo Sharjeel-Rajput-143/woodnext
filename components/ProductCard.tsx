@@ -1,6 +1,6 @@
 "use client";
 
-import { categoryLabel, type Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
 import { HeartIcon, WhatsAppIcon } from "./Icons";
 import ProductImage from "./ProductImage";
 import { useShop } from "./ShopProvider";
@@ -30,7 +30,7 @@ export default function ProductCard({ product, index }: { product: Product; inde
         </button>
       </div>
       <div className="card-body">
-        <p className="card-cat">{categoryLabel(product.category)}</p>
+        <p className="card-cat">{product.categoryLabel}</p>
         <h3 className="card-title">{product.title}</h3>
         <p className="card-desc">{product.description}</p>
         <p className="card-price">Price on WhatsApp</p>

@@ -1,363 +1,81 @@
-export type CategoryId = "bed" | "kitchen" | "door";
+// Shared (client + server safe) types and helpers. The data itself lives in data/catalog.json
+// and is edited from the /admin panel.
+
+export const ICONS = ["bed", "kitchen", "door", "chair", "sofa", "table", "wardrobe", "tag"] as const;
+export type IconName = (typeof ICONS)[number];
 
 export type Category = {
-  id: CategoryId;
+  /** URL-safe id, e.g. "bed". Used in `?tab=` links. */
+  id: string;
+  /** Long label, e.g. "Bed Designs". */
   label: string;
-  /** Short name for chips and links. */
+  /** Short name used in the navbar, e.g. "Beds". */
   name: string;
+  icon: IconName;
 };
 
-export type Product = {
+export type StoredProduct = {
   id: string;
-  category: CategoryId;
+  category: string;
   title: string;
   description: string;
   /** Extra details sent to WhatsApp with the product. */
   specs: string[];
-  /** Remote URL (images.unsplash.com) or a local path like "/products/bed-1.jpg". */
+  /** https URL, or "/uploads/<file>" for photos uploaded in the admin panel. */
   image: string;
 };
 
-export type SortKey = "featured" | "az" | "za";
+/** Product as shown on the site (the category label is added when the catalog is loaded). */
+export type Product = StoredProduct & { categoryLabel: string };
 
-export const CATEGORIES: Category[] = [
-  { id: "bed", label: "Bed Designs", name: "Beds" },
-  { id: "kitchen", label: "Kitchen Designs", name: "Kitchens" },
-  { id: "door", label: "Door Designs", name: "Doors" },
-];
+export type Video = {
+  id: string;
+  title: string;
+  description: string;
+  /** The 11-character YouTube video id. */
+  youtubeId: string;
+};
 
-export const DEFAULT_CATEGORY: CategoryId = "bed";
+export type StoredCatalog = {
+  /** Increases on every save; used to detect two people editing at once. */
+  rev: number;
+  categories: Category[];
+  products: StoredProduct[];
+  videos: Video[];
+};
 
-export function isCategoryId(value: unknown): value is CategoryId {
-  return CATEGORIES.some((c) => c.id === value);
+export type Catalog = {
+  categories: Category[];
+  products: Product[];
+  videos: Video[];
+};
+
+export function withLabels(stored: StoredCatalog): Catalog {
+  const labels = new Map(stored.categories.map((c) => [c.id, c.label]));
+  return {
+    categories: stored.categories,
+    videos: stored.videos,
+    products: stored.products.map((p) => ({ ...p, categoryLabel: labels.get(p.category) ?? p.category })),
+  };
 }
 
-export function categoryLabel(id: CategoryId): string {
-  return CATEGORIES.find((c) => c.id === id)?.label ?? id;
-}
-
-/** Unsplash photo by id. Replace with your own photos (e.g. "/products/bed-1.jpg") any time. */
-export const photo = (id: string) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
-
-// Dummy products. Replace with real ones whenever you are ready.
-export const PRODUCTS: Product[] = [
-  // ------------------------------ Beds ------------------------------
-  {
-    id: "BED-101",
-    category: "bed",
-    title: "Executive Panel Bed",
-    description: "Padded panel headboard with bedside tables. Hotel-style comfort at home.",
-    specs: ["King size", "Padded headboard", "Bedside tables included"],
-    image: photo("photo-1631049307264-da0ec9d70304"),
-  },
-  {
-    id: "BED-102",
-    category: "bed",
-    title: "Whitewash Panel Bed",
-    description: "Bright, airy bed with a clean panel headboard that suits small rooms.",
-    specs: ["Queen / King size", "Whitewash finish"],
-    image: photo("photo-1613685703237-6628de38ddb7"),
-  },
-  {
-    id: "BED-103",
-    category: "bed",
-    title: "Walnut Platform Bed",
-    description: "Low platform bed with a wood-panel backdrop. Calm, modern and easy to live with.",
-    specs: ["King size", "Walnut finish", "Low platform"],
-    image: photo("photo-1696762932825-2737db830bbe"),
-  },
-  {
-    id: "BED-104",
-    category: "bed",
-    title: "Cream Lounge Bed",
-    description: "Soft cream upholstered frame with warm lamps and matching bedside tables.",
-    specs: ["King size", "Cream upholstery", "Bedside tables"],
-    image: photo("photo-1698517486200-e89403ea2738"),
-  },
-  {
-    id: "BED-105",
-    category: "bed",
-    title: "Blue Storage Bed",
-    description: "Padded blue headboard with a built-in wardrobe wall for smart storage.",
-    specs: ["King size", "Padded headboard", "Wardrobe unit"],
-    image: photo("photo-1680503146476-abb8c752e1f4"),
-  },
-  {
-    id: "BED-106",
-    category: "bed",
-    title: "Channel Velvet Bed",
-    description: "Curved channel-tufted design that makes the bedroom the star of the house.",
-    specs: ["King size", "Velvet upholstery"],
-    image: photo("photo-1616594039964-ae9021a400a0"),
-  },
-  {
-    id: "BED-107",
-    category: "bed",
-    title: "Grand Suite Bed",
-    description: "Wide, grand frame with a tall headboard. Hotel-suite comfort for your home.",
-    specs: ["Super king size", "Tall headboard"],
-    image: photo("photo-1765862835193-3c37388a409e"),
-  },
-  {
-    id: "BED-108",
-    category: "bed",
-    title: "Scandi Oak Bed",
-    description: "Clean Scandinavian lines with a slim headboard and a matching side table.",
-    specs: ["Queen / King size", "Natural oak finish"],
-    image: photo("photo-1522771739844-6a9f6d5f14af"),
-  },
-  {
-    id: "BED-109",
-    category: "bed",
-    title: "Mirror Wall Bed",
-    description: "Elegant bed styled with a statement round mirror and soft ambient light.",
-    specs: ["King size", "Padded headboard"],
-    image: photo("photo-1678978866819-306ed8608e7f"),
-  },
-  {
-    id: "BED-110",
-    category: "bed",
-    title: "Library Headboard Bed",
-    description: "Wooden headboard with built-in shelves and lighting. Everything within reach.",
-    specs: ["King size", "Built-in shelves", "LED lighting"],
-    image: photo("photo-1757344454333-cc666252e596"),
-  },
-  {
-    id: "BED-111",
-    category: "bed",
-    title: "Midnight Tufted Bed",
-    description: "Deep grey tufted headboard with a cushioned bench. Made for statement bedrooms.",
-    specs: ["King size", "Upholstered headboard", "Bench included"],
-    image: photo("photo-1632829401795-2745c905ac77"),
-  },
-  {
-    id: "BED-112",
-    category: "bed",
-    title: "Heritage Bench Bed",
-    description: "Warm wood bench at the foot of the bed for extra seating and a classic look.",
-    specs: ["King size", "Matching bench"],
-    image: photo("photo-1616486029423-aaa4789e8c9a"),
-  },
-
-  // ----------------------------- Kitchens -----------------------------
-  {
-    id: "KIT-201",
-    category: "kitchen",
-    title: "White Marble Island Kitchen",
-    description: "Handle-less white cabinets, a marble-look top and an open work island.",
-    specs: ["Custom size", "Soft-close drawers", "Marble-look top"],
-    image: photo("photo-1556911220-bff31c812dba"),
-  },
-  {
-    id: "KIT-202",
-    category: "kitchen",
-    title: "Shaker Grey Kitchen",
-    description: "Timeless shaker doors in warm grey with brass handles and a deep sink bay.",
-    specs: ["Custom size", "Brass handles"],
-    image: photo("photo-1565538810643-b5bdb714032a"),
-  },
-  {
-    id: "KIT-203",
-    category: "kitchen",
-    title: "Charcoal Shaker Kitchen",
-    description: "Bold charcoal cabinets with open wood shelves and a sunny window nook.",
-    specs: ["Custom size", "Open shelves"],
-    image: photo("photo-1600489000022-c2086d79f9d4"),
-  },
-  {
-    id: "KIT-204",
-    category: "kitchen",
-    title: "Wood Island Kitchen",
-    description: "White cabinetry paired with a warm wooden island and bar seating.",
-    specs: ["Island with seating", "Wood + white finish"],
-    image: photo("photo-1556912172-45b7abe8b7e1"),
-  },
-  {
-    id: "KIT-205",
-    category: "kitchen",
-    title: "Glass-Door Bar Kitchen",
-    description: "Tall glass-door display cabinets with a breakfast bar and statement stools.",
-    specs: ["Custom size", "Glass cabinets", "Breakfast bar"],
-    image: photo("photo-1622372738946-62e02505feb3"),
-  },
-  {
-    id: "KIT-206",
-    category: "kitchen",
-    title: "Grey Waterfall Kitchen",
-    description: "Grey cabinetry with a waterfall-edge island and a marble-look floor.",
-    specs: ["Waterfall island", "Soft-close drawers"],
-    image: photo("photo-1665507279644-67d8ed143a84"),
-  },
-  {
-    id: "KIT-207",
-    category: "kitchen",
-    title: "Walnut Marble Kitchen",
-    description: "Dark walnut-toned cabinets with a dramatic marble waterfall counter.",
-    specs: ["Custom size", "Marble-look counter"],
-    image: photo("photo-1588854337236-6889d631faa8"),
-  },
-  {
-    id: "KIT-208",
-    category: "kitchen",
-    title: "Splashback L-Kitchen",
-    description: "Light grey cabinets with a marble splashback and a clean L-shaped layout.",
-    specs: ["L-shape layout", "Marble-look splashback"],
-    image: photo("photo-1722605090433-41d1183a792d"),
-  },
-  {
-    id: "KIT-209",
-    category: "kitchen",
-    title: "Oak Gallery Kitchen",
-    description: "Floor-to-ceiling oak cabinets in a long gallery layout with plenty of storage.",
-    specs: ["Gallery layout", "Oak finish"],
-    image: photo("photo-1502005097973-6a7082348e28"),
-  },
-  {
-    id: "KIT-210",
-    category: "kitchen",
-    title: "Garden View Kitchen",
-    description: "Light-filled kitchen with a big window, stone counters and a cooking island.",
-    specs: ["Custom size", "Island counter"],
-    image: photo("photo-1617228069096-4638a7ffc906"),
-  },
-  {
-    id: "KIT-211",
-    category: "kitchen",
-    title: "Black & White Island Kitchen",
-    description: "Bold black cabinets with a bright white countertop and a roomy island.",
-    specs: ["Custom size", "Black + white finish"],
-    image: photo("photo-1714860534425-7ce04e013dec"),
-  },
-  {
-    id: "KIT-212",
-    category: "kitchen",
-    title: "Matte Black Kitchen",
-    description: "Sleek matte black cabinets with a wall chimney hood for a modern statement.",
-    specs: ["L-shape layout", "Matte finish", "Chimney hood"],
-    image: photo("photo-1600684388091-627109f3cd60"),
-  },
-
-  // ------------------------------ Doors ------------------------------
-  {
-    id: "DOR-301",
-    category: "door",
-    title: "Carved Arch Heritage Door",
-    description: "Hand-carved arched double door in rich aged wood. A true entrance statement.",
-    specs: ["Solid wood", "Hand-carved", "Arched double door"],
-    image: photo("photo-1630579083524-e3ac854edb46"),
-  },
-  {
-    id: "DOR-302",
-    category: "door",
-    title: "Rustic Blue Door",
-    description: "Distressed blue wooden door with character. Adds colour to any entrance.",
-    specs: ["Solid wood", "Distressed paint finish"],
-    image: photo("photo-1577670552647-6ce12a463e7d"),
-  },
-  {
-    id: "DOR-303",
-    category: "door",
-    title: "Ornate Green Double Door",
-    description: "Deep green double door with detailed carved panels for grand entrances.",
-    specs: ["Solid wood", "Carved panels", "Double door"],
-    image: photo("photo-1518882542732-7b2826f7b1bd"),
-  },
-  {
-    id: "DOR-304",
-    category: "door",
-    title: "Fanlight Panel Door",
-    description: "Classic six-panel door with an elegant fanlight window above.",
-    specs: ["Painted finish", "Six panels", "Fanlight"],
-    image: photo("photo-1510266988780-b681a96dca2a"),
-  },
-  {
-    id: "DOR-305",
-    category: "door",
-    title: "Blush Glass Front Door",
-    description: "Wooden front door with a glazed top and a soft blush painted finish.",
-    specs: ["Painted finish", "Glazed top"],
-    image: photo("photo-1556580004-7eca73f3a3ea"),
-  },
-  {
-    id: "DOR-306",
-    category: "door",
-    title: "Glass Panel Double Door",
-    description: "Wooden double door with decorative glass panels that let the light in.",
-    specs: ["Solid wood", "Decorative glass", "Double door"],
-    image: photo("photo-1530982937671-bc00141b5d79"),
-  },
-  {
-    id: "DOR-307",
-    category: "door",
-    title: "Contemporary Oak Double Door",
-    description: "Clean, flat oak double door with long bar handles for modern homes.",
-    specs: ["Oak finish", "Double door", "Bar handles"],
-    image: photo("photo-1677468678917-310526a5ab15"),
-  },
-  {
-    id: "DOR-308",
-    category: "door",
-    title: "Arched Teak Entry Door",
-    description: "Warm teak arched door with a polished finish. Perfect for the main entrance.",
-    specs: ["Teak wood", "Arched top", "Polished finish"],
-    image: photo("photo-1720265017851-c0e2d2f9c81e"),
-  },
-  {
-    id: "DOR-309",
-    category: "door",
-    title: "Classic Panel Walnut Door",
-    description: "Traditional raised panels in rich walnut. Strong, elegant and built to last.",
-    specs: ["Solid wood", "Walnut polish", "Custom height & width"],
-    image: photo("photo-1629999400001-5e666f0754d9"),
-  },
-  {
-    id: "DOR-310",
-    category: "door",
-    title: "Glass & Oak Entrance Door",
-    description: "Light oak frame with a full-height glass panel for a bright, modern entrance.",
-    specs: ["Oak frame", "Full-height glass"],
-    image: photo("photo-1617307074423-6344f18d357f"),
-  },
-  {
-    id: "DOR-311",
-    category: "door",
-    title: "Frosted Glass Double Door",
-    description: "Dark wood frame with frosted glass panes. Privacy without losing light.",
-    specs: ["Dark wood frame", "Frosted glass", "Double door"],
-    image: photo("photo-1759803545394-041ea7b71989"),
-  },
-  {
-    id: "DOR-312",
-    category: "door",
-    title: "White Panel Double Door",
-    description: "Tall painted double door with classic panels for bright interiors.",
-    specs: ["Painted finish", "Double door", "Classic panels"],
-    image: photo("photo-1561111283-8eff0e921cf6"),
-  },
-];
-
-export function productsByCategory(category: CategoryId): Product[] {
-  return PRODUCTS.filter((p) => p.category === category);
-}
-
-export function sortProducts(list: Product[], sort: SortKey): Product[] {
-  if (sort === "featured") return list;
-  const sorted = [...list].sort((a, b) => a.title.localeCompare(b.title));
-  return sort === "za" ? sorted.reverse() : sorted;
+export function productsByCategory(products: Product[], category: string): Product[] {
+  return products.filter((p) => p.category === category);
 }
 
 /** Simple "all words must match" search across title, description, specs, code and category. */
-export function searchProducts(query: string): Product[] {
+export function searchProducts(products: Product[], query: string): Product[] {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   if (!words.length) return [];
-  return PRODUCTS.filter((p) => {
-    const haystack = [p.title, p.description, p.id, categoryLabel(p.category), ...p.specs]
-      .join(" ")
-      .toLowerCase();
+  return products.filter((p) => {
+    const haystack = [p.title, p.description, p.id, p.categoryLabel, ...p.specs].join(" ").toLowerCase();
     return words.every((w) => haystack.includes(w));
   });
 }
+
+/** Unsplash photo by id (used for the static section photos). */
+export const photo = (id: string) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
 
 /** Landscape crop of the product photo used for link previews (WhatsApp, Facebook). */
 export function ogImage(product: Product): string {
@@ -369,4 +87,13 @@ export function ogImage(product: Product): string {
   url.searchParams.set("h", "630");
   url.searchParams.set("q", "70");
   return url.toString();
+}
+
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 24);
 }

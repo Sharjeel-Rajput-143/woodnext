@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_SITE_URL: siteUrl },
   // Don't generate AGENTS.md / CLAUDE.md into the project.
   agentRules: false,
+  // The catalog and uploaded photos are read from disk at request time, so make sure they ship with the deployment.
+  outputFileTracingIncludes: { "/**": ["./data/**/*"] },
   images: {
     loader: "custom",
     loaderFile: "./lib/image-loader.ts",

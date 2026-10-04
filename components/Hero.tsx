@@ -16,8 +16,9 @@ const SWIPE_PX = 45;
  * Full-screen slider. It shows the products of the selected category tab and auto-plays.
  */
 export default function Hero() {
-  const { category, select } = useShop();
-  const slides = productsByCategory(category).slice(0, MAX_SLIDES);
+  const { categories, products, category, select } = useShop();
+  const slides = productsByCategory(products, category).slice(0, MAX_SLIDES);
+  const categoryName = categories.find((c) => c.id === category)?.label ?? "designs";
   const count = slides.length;
 
   // Index resets to the first slide whenever the category changes.
@@ -60,6 +61,22 @@ export default function Hero() {
       <h1 className="sr-only">Custom wood beds, kitchens and doors. Get the price on WhatsApp.</h1>
 
       <div className="hero-stage">
+        {slides.length === 0 && (
+          <div className="slide slide-empty is-active">
+            <div className="container slide-inner">
+              <div className="slide-copy">
+                <h2 className="slide-title">{categoryName}</h2>
+                <p className="slide-desc">New designs are coming soon. Message us on WhatsApp and we will build it for you.</p>
+                <div className="slide-actions">
+                  <WhatsAppLink className="btn btn-wa btn-lg">
+                    <WhatsAppIcon className="btn-icon" />
+                    Ask on WhatsApp
+                  </WhatsAppLink>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {slides.map((product, i) => {
           const active = i === index;
           return (

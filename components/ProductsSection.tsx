@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  PRODUCTS,
-  categoryLabel,
-  productsByCategory,
-  searchProducts,
-} from "@/lib/products";
+import { productsByCategory, searchProducts } from "@/lib/products";
 import CategoryTabs from "./CategoryTabs";
 import { WhatsAppIcon } from "./Icons";
 import ProductCard from "./ProductCard";
@@ -16,20 +11,20 @@ import WhatsAppLink from "./WhatsAppLink";
 const PANEL_ID = "products-panel";
 
 export default function ProductsSection() {
-  const { category, select, query, setQuery, showSaved, toggleSavedView, savedIds } = useShop();
+  const { categories, products: allProducts, category, select, query, setQuery, showSaved, toggleSavedView, savedIds } = useShop();
   const searching = query.trim().length > 0;
 
   const products = showSaved
-    ? PRODUCTS.filter((p) => savedIds.includes(p.id))
+    ? allProducts.filter((p) => savedIds.includes(p.id))
     : searching
-      ? searchProducts(query)
-      : productsByCategory(category);
+      ? searchProducts(allProducts, query)
+      : productsByCategory(allProducts, category);
 
   const heading = showSaved
     ? "Saved designs"
     : searching
       ? `Results for “${query.trim()}”`
-      : categoryLabel(category);
+      : (categories.find((c) => c.id === category)?.label ?? "Designs");
 
   const viewKey = showSaved ? "saved" : searching ? `q:${query.trim()}` : category;
 
@@ -75,6 +70,17 @@ export default function ProductsSection() {
                   <button type="button" className="btn btn-dark" onClick={toggleSavedView}>
                     Browse designs
                   </button>
+                </>
+              ) : !searching ? (
+                <>
+                  <h3>No designs here yet</h3>
+                  <p>New designs are coming soon. Tell us what you need on WhatsApp.</p>
+                  <div className="empty-actions">
+                    <WhatsAppLink className="btn btn-wa">
+                      <WhatsAppIcon className="btn-icon" />
+                      Ask on WhatsApp
+                    </WhatsAppLink>
+                  </div>
                 </>
               ) : (
                 <>

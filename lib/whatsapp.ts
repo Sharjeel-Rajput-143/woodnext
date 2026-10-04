@@ -1,5 +1,5 @@
 import { SITE } from "./site";
-import { categoryLabel, type Product } from "./products";
+import type { Product } from "./products";
 
 export type AdSource = { source?: string; campaign?: string };
 
@@ -42,7 +42,7 @@ export function productWhatsappUrl(product: Product, ad?: AdSource): string {
     "",
     `*Product:* ${product.title}`,
     `*Code:* ${product.id}`,
-    `*Category:* ${categoryLabel(product.category)}`,
+    `*Category:* ${product.categoryLabel}`,
     `*Details:* ${product.description}`,
   ];
   if (product.specs.length) lines.push(`*Specs:* ${product.specs.join(", ")}`);

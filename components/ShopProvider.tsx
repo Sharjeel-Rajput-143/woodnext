@@ -8,12 +8,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CategoryId } from "@/lib/products";
+import type { Catalog, Category, Product, Video } from "@/lib/products";
 import { useSavedIds } from "@/lib/saved";
 
 type ShopContextValue = {
-  category: CategoryId;
-  select: (id: CategoryId) => void;
+  categories: Category[];
+  products: Product[];
+  videos: Video[];
+  category: string;
+  select: (id: string) => void;
   query: string;
   setQuery: (value: string) => void;
   showSaved: boolean;
@@ -37,23 +40,31 @@ export function scrollToProducts() {
 }
 
 /**
- * Shared shop state: selected category (drives hero carousel, tabs and grid),
- * search text and saved designs.
+ * Shared shop state: the catalog (managed from /admin), the selected category
+ * (drives hero carousel, tabs and grid), search text and saved designs.
  */
 export default function ShopProvider({
+  catalog,
   initialCategory,
   children,
 }: {
-  /** Chosen on the server from `?tab=` so Meta ad deep links render the right tab immediately. */
-  initialCategory: CategoryId;
+  catalog: Catalog;
+  /** Chosen on the server from `?tab=` so ad deep links render the right tab immediately. */
+  initialCategory: string;
   children: ReactNode;
 }) {
-  const [category, setCategory] = useState<CategoryId>(initialCategory);
+  const { categories, products, videos } = catalog;
+  const [category, setCategory] = useState(initialCategory);
   const [query, setQueryState] = useState("");
   const [showSaved, setShowSaved] = useState(false);
-  const { ids: savedIds, toggle: toggleSave } = useSavedIds();
+  const { ids: storedIds, toggle: toggleSave } = useSavedIds();
+  // Ignore saved designs that were deleted from the catalog.
+  const savedIds = useMemo(
+    () => storedIds.filter((id) => products.some((p) => p.id === id)),
+    [storedIds, products],
+  );
 
-  const select = useCallback((id: CategoryId) => {
+  const select = useCallback((id: string) => {
     setCategory(id);
     setQueryState("");
     setShowSaved(false);
@@ -78,6 +89,9 @@ export default function ShopProvider({
 
   const value = useMemo<ShopContextValue>(
     () => ({
+      categories,
+      products,
+      videos,
       category,
       select,
       query,
@@ -88,7 +102,7 @@ export default function ShopProvider({
       isSaved: (id) => savedIds.includes(id),
       toggleSave,
     }),
-    [category, select, query, setQuery, showSaved, toggleSavedView, savedIds, toggleSave],
+    [categories, products, videos, category, select, query, setQuery, showSaved, toggleSavedView, savedIds, toggleSave],
   );
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

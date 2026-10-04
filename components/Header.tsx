@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { CATEGORIES } from "@/lib/products";
 import { SITE } from "@/lib/site";
 import { CloseIcon, HeartIcon, LogoMark, SearchIcon, WhatsAppIcon } from "./Icons";
 import { scrollToProducts, useShop } from "./ShopProvider";
@@ -9,7 +8,7 @@ import ThemeToggle from "./ThemeToggle";
 import WhatsAppLink from "./WhatsAppLink";
 
 export default function Header() {
-  const { category, select, query, setQuery, showSaved, toggleSavedView, savedIds } = useShop();
+  const { categories, videos, category, select, query, setQuery, showSaved, toggleSavedView, savedIds } = useShop();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -46,7 +45,7 @@ export default function Header() {
     scrollToProducts();
   }
 
-  function goCategory(id: (typeof CATEGORIES)[number]["id"]) {
+  function goCategory(id: string) {
     select(id);
     setMenuOpen(false);
     scrollToProducts();
@@ -64,7 +63,7 @@ export default function Header() {
           <a href="#top" className="nav-link" onClick={() => setMenuOpen(false)}>
             Home
           </a>
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <button
               key={c.id}
               type="button"
@@ -74,6 +73,11 @@ export default function Header() {
               {c.name}
             </button>
           ))}
+          {videos.length > 0 && (
+            <a href="#videos" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Videos
+            </a>
+          )}
           <a href="#how" className="nav-link" onClick={() => setMenuOpen(false)}>
             How it works
           </a>

@@ -1,5 +1,5 @@
 {
-  "rev": 4,
+  "rev": 5,
   "categories": [
     {
       "id": "bed",
@@ -434,16 +434,6 @@
         "Classic panels"
       ],
       "image": "https://images.unsplash.com/photo-1561111283-8eff0e921cf6?auto=format&fit=crop&w=1600&q=80"
-    },
-    {
-      "id": "LIVE-CHK",
-      "category": "bed",
-      "title": "Live Cache Check Item EDITED",
-      "description": "Temporary item to test caching. Safe to ignore.",
-      "specs": [
-        "test"
-      ],
-      "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1600&q=80"
     }
   ],
   "videos": []

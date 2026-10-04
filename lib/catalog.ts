@@ -1,6 +1,8 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { promises as fs } from "node:fs";
+import http from "node:http";
+import https from "node:https";
 import path from "node:path";
 import { withLabels, type Catalog, type StoredCatalog } from "./products";
 import { sanitizeCatalog } from "./validate";
@@ -52,10 +54,13 @@ function ghRepo() {
 
 async function gh(pathname: string, init: RequestInit & { raw?: boolean } = {}) {
   const { repo, token, branch } = ghRepo();
-  const url = `https://api.github.com/repos/${repo}/contents/${pathname}${init.method === "PUT" ? "" : `?ref=${branch}`}`;
+  const base = process.env.GITHUB_API_URL || "https://api.github.com";
+  const url = `${base}/repos/${repo}/contents/${pathname}${init.method === "PUT" ? "" : `?ref=${branch}`}`;
   const res = await fetch(url, {
     ...init,
     cache: "no-store",
+    // Never let a slow GitHub call hang (and pile up) forever.
+    signal: AbortSignal.timeout(10_000),
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: init.raw ? "application/vnd.github.raw+json" : "application/vnd.github+json",
@@ -68,8 +73,14 @@ async function gh(pathname: string, init: RequestInit & { raw?: boolean } = {}) 
 
 async function ghRead(pathname: string): Promise<{ text: string; sha: string } | null> {
   const res = await gh(pathname);
-  if (res.status === 404) return null;
-  if (!res.ok) throw new CatalogError(`GitHub could not be read (${res.status}).`, 502);
+  if (res.status === 404) {
+    await res.body?.cancel();
+    return null;
+  }
+  if (!res.ok) {
+    await res.body?.cancel();
+    throw new CatalogError(`GitHub could not be read (${res.status}).`, 502);
+  }
   const json = (await res.json()) as { content: string; sha: string };
   return { text: Buffer.from(json.content, "base64").toString("utf8"), sha: json.sha };
 }
@@ -80,6 +91,8 @@ async function ghWrite(pathname: string, content: Buffer, message: string, sha?:
     method: "PUT",
     body: JSON.stringify({ message, content: content.toString("base64"), branch, ...(sha ? { sha } : {}) }),
   });
+  // Release the response body in every case so connections are not left open.
+  await res.body?.cancel();
   if (res.status === 409 || res.status === 422) {
     throw new CatalogError("The data changed elsewhere. Reload the page and try again.", 409);
   }
@@ -93,10 +106,68 @@ async function readFromDisk(): Promise<StoredCatalog> {
   return parsed.value;
 }
 
+/**
+ * Plain GET with Node's own http client. Used while public pages are being (re)built: Next.js intercepts
+ * `fetch` during page rendering and would switch the page to dynamic rendering, which we do not want here.
+ */
+function httpGetText(url: string, headers: Record<string, string>, timeoutMs = 10_000): Promise<{ status: number; body: string }> {
+  const MAX_BYTES = 5_000_000;
+  return new Promise((resolve, reject) => {
+    const target = new URL(url);
+    const client = target.protocol === "http:" ? http : https;
+    const request = client.get(target, { headers: { "User-Agent": "catalog-reader", ...headers } }, (response) => {
+      const chunks: Buffer[] = [];
+      let size = 0;
+      response.on("data", (chunk: Buffer) => {
+        size += chunk.length;
+        if (size > MAX_BYTES) {
+          request.destroy(new Error("GitHub response too large"));
+          return;
+        }
+        chunks.push(chunk);
+      });
+      response.on("end", () => resolve({ status: response.statusCode ?? 0, body: Buffer.concat(chunks).toString("utf8") }));
+      response.on("error", reject);
+    });
+    request.setTimeout(timeoutMs, () => request.destroy(new Error("GitHub request timed out")));
+    request.on("error", reject);
+  });
+}
+
+async function readCatalogFromGitHub(): Promise<StoredCatalog | null> {
+  const { repo, token, branch } = ghRepo();
+  const base = process.env.GITHUB_API_URL || "https://api.github.com";
+  const response = await httpGetText(`${base}/repos/${repo}/contents/${GH_CATALOG_PATH}?ref=${branch}`, {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/vnd.github.raw+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  });
+  if (response.status !== 200) return null;
+  const parsed = sanitizeCatalog(JSON.parse(response.body));
+  return parsed.ok ? parsed.value : null;
+}
+
+/**
+ * Catalog data for the public pages. While the site is being built it comes from data/catalog.json.
+ * At runtime in "github" mode it comes straight from GitHub, so a page re-built right after an admin save
+ * shows the new data at once (without waiting for the redeploy that the save also triggers).
+ */
+async function readPublicCatalog(): Promise<StoredCatalog> {
+  if (storageMode() === "github" && process.env.NEXT_PHASE !== "phase-production-build") {
+    try {
+      const latest = await readCatalogFromGitHub();
+      if (latest) return latest;
+    } catch (error) {
+      console.error("Could not read the catalog from GitHub, using the deployed copy:", error);
+    }
+  }
+  return readFromDisk();
+}
+
 /** Catalog for the public site. Never throws: falls back to an empty catalog if the file is damaged. */
 export async function getCatalog(): Promise<Catalog> {
   try {
-    return withLabels(await readFromDisk());
+    return withLabels(await readPublicCatalog());
   } catch (error) {
     console.error("Could not read data/catalog.json:", error);
     return withLabels(EMPTY);
@@ -192,7 +263,10 @@ export async function readUpload(name: string): Promise<{ data: Buffer; type: st
     // Just uploaded and not deployed yet: fetch it from GitHub.
     if (storageMode() !== "github") return null;
     const res = await gh(`data/uploads/${name}`, { raw: true });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      await res.body?.cancel();
+      return null;
+    }
     return { data: Buffer.from(await res.arrayBuffer()), type };
   }
 }

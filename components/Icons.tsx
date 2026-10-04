@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { CategoryId } from "@/lib/products";
 
 type IconProps = { className?: string };
@@ -137,20 +138,15 @@ export function FeatureIcon({ name, className }: IconProps & { name: FeatureIcon
   );
 }
 
-/** WoodNext mark: an "N" on an oak badge. */
 export function LogoMark({ className }: IconProps) {
   return (
-    <svg className={className} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-      <rect width="32" height="32" rx="9" fill="#c28a4b" />
-      <path
-        d="M9.5 23V9.5L22.5 22.5V9"
-        fill="none"
-        stroke="#14202d"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="22.5" cy="9" r="1.6" fill="#14202d" />
-    </svg>
+    <Image
+      src="/logo-mark.png"
+      alt=""
+      width={96}
+      height={96}
+      className={className}
+      priority
+    />
   );
 }

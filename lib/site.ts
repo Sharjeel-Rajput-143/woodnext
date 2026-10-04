@@ -1,6 +1,6 @@
 export const SITE = {
   brand: "WoodNext",
-  tagline: "Wood furniture, made to measure",
+  tagline: "Handcrafted wood furniture",
   // International format, digits only: +92 319 2304193 -> 923192304193
   whatsappNumber: "923192304193",
   phoneDisplay: "+92 319 2304193",

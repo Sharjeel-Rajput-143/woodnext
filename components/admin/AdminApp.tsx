@@ -42,12 +42,6 @@ const HEAD: Record<View, { title: string; subtitle: string }> = {
   videos: { title: "Videos", subtitle: "YouTube videos shown on your website" },
 };
 
-const BADGE: Record<StorageMode, { text: string; kind: string }> = {
-  github: { text: "Saves to GitHub", kind: "info" },
-  file: { text: "Saves locally", kind: "ok" },
-  readonly: { text: "Read-only", kind: "warn" },
-};
-
 /** The owner's control panel: sidebar, header and pages for products, categories (navigation) and videos. */
 export default function AdminApp({
   initialCatalog,
@@ -167,7 +161,6 @@ export default function AdminApp({
   const closeEditor = () => setEditor(null);
   const detail = view === "products" && detailId ? catalog.products.find((p) => p.id === detailId) : undefined;
   const head = detail ? { title: detail.title, subtitle: "Product details" } : HEAD[view];
-  const badge = BADGE[mode];
 
   return (
     <div className="adm">
@@ -224,7 +217,6 @@ export default function AdminApp({
             <p>{head.subtitle}</p>
           </div>
           <div className="adm-head-actions">
-            <span className={`adm-badge adm-badge-${badge.kind}`}>{badge.text}</span>
             <ThemeToggle />
             <span className="adm-avatar" title="Owner" aria-hidden="true">
               O

@@ -1,5 +1,5 @@
 {
-  "rev": 3,
+  "rev": 4,
   "categories": [
     {
       "id": "bed",
@@ -438,7 +438,7 @@
     {
       "id": "LIVE-CHK",
       "category": "bed",
-      "title": "Live Cache Check Item",
+      "title": "Live Cache Check Item EDITED",
       "description": "Temporary item to test caching. Safe to ignore.",
       "specs": [
         "test"

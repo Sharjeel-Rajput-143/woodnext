@@ -6,7 +6,6 @@ import ProductImage from "@/components/ProductImage";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { getCatalog } from "@/lib/catalog";
 import { ogImage } from "@/lib/products";
-import { SITE } from "@/lib/site";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -25,7 +24,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const product = await findProduct(id);
   if (!product) return {};
-  const title = `${product.title} | ${SITE.brand}`;
+  const { brand } = await getCatalog();
+  const title = `${product.title} | ${brand}`;
   const image = ogImage(product);
   return {
     title,
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description: product.description,
       type: "website",
-      siteName: SITE.brand,
+      siteName: brand,
       images: [{ url: image, width: 1200, height: 630, alt: product.title }],
     },
     twitter: { card: "summary_large_image", title, images: [image] },
@@ -49,6 +49,7 @@ export default async function ProductPage({ params }: Props) {
   const { id } = await params;
   const product = await findProduct(id);
   if (!product) notFound();
+  const { brand } = await getCatalog();
 
   return (
     <>
@@ -56,7 +57,7 @@ export default async function ProductPage({ params }: Props) {
         <div className="container pp-bar-inner">
           <Link href="/" className="logo">
             <LogoMark className="logo-mark" />
-            <span>{SITE.brand}</span>
+            <span>{brand}</span>
           </Link>
           <Link href={`/?tab=${product.category}#products`} className="btn btn-outline btn-sm">
             All designs
@@ -86,6 +87,13 @@ export default async function ProductPage({ params }: Props) {
           <p className="pp-note">We reply with the price, size options and delivery time.</p>
         </div>
       </main>
+
+      <div className="pp-cta">
+        <WhatsAppLink product={product} className="btn btn-wa btn-lg">
+          <WhatsAppIcon className="btn-icon" />
+          Get Price on WhatsApp
+        </WhatsAppLink>
+      </div>
     </>
   );
 }

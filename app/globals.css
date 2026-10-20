@@ -2768,6 +2768,28 @@ button.adm-stat:hover {
 .adm-account .adm-form {
   margin-top: 14px;
 }
+.adm-preview {
+  display: grid;
+  gap: 4px 14px;
+  margin: 14px 0;
+}
+.adm-preview dt {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.adm-preview dd {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
 .adm-login-link {
   align-self: center;
   border: 0;
@@ -3027,5 +3049,340 @@ button.adm-cell-main:hover strong {
   .adm-detail {
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     align-items: start;
+  }
+}
+
+/* ======================= Phone layout: bottom navigation ======================= */
+:root {
+  --bnav-h: 62px;
+}
+.bnav,
+.bsheet,
+.bsheet-scrim {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  /* ---- the bar */
+  .bnav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    height: calc(var(--bnav-h) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--header-bg);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.12);
+  }
+  .bnav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    padding: 6px 2px 4px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.1;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s;
+  }
+  .bnav-item > span:last-child {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* every icon sits in a 30px slot so the labels line up (the WhatsApp pill is 30px tall) */
+  .bnav-item > svg {
+    box-sizing: content-box;
+    width: 24px;
+    height: 24px;
+    padding: 3px 0;
+  }
+  .bnav-item.is-active {
+    color: var(--accent);
+  }
+  .bnav-item.is-active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 28%;
+    right: 28%;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--accent);
+  }
+  .bnav-item:active {
+    background: var(--soft);
+  }
+  .bnav-ico {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 30px;
+  }
+  .bnav-ico > svg {
+    width: 24px;
+    height: 24px;
+  }
+  .bnav-ico-wa {
+    width: 46px;
+    height: 30px;
+    border-radius: 15px;
+    background: var(--wa);
+    color: #fff;
+  }
+  .bnav-ico-wa > svg {
+    width: 22px;
+    height: 22px;
+  }
+  .bnav-wa {
+    color: var(--ink);
+  }
+  .bnav-badge {
+    position: absolute;
+    top: -5px;
+    right: -9px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+
+  /* ---- the sheet that slides up from the bar */
+  .bsheet-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 64;
+    display: block;
+    border: 0;
+    background: rgba(10, 10, 10, 0.5);
+  }
+  .bsheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom));
+    z-index: 65;
+    display: block;
+    max-height: calc(100svh - var(--bnav-h) - 72px);
+    overflow-y: auto;
+    padding: 6px 16px 10px;
+    border-radius: 20px 20px 0 0;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.3);
+    animation: bsheet-in 0.22s ease-out;
+  }
+  .bsheet-title {
+    padding: 12px 4px 6px;
+    font-family: var(--font-serif-stack);
+    font-size: 1.1rem;
+    color: var(--heading);
+  }
+  .bsheet-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    min-height: 54px;
+    padding: 0 6px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink);
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .bsheet-item.is-active {
+    color: var(--accent);
+  }
+  .bsheet-icon {
+    width: 24px;
+    height: 24px;
+    flex: none;
+  }
+  .bsheet-count {
+    margin-left: auto;
+    min-width: 28px;
+    padding: 1px 9px;
+    border-radius: 999px;
+    background: var(--sand);
+    color: var(--heading);
+    font-size: 0.8rem;
+    text-align: center;
+  }
+  .bsheet-links .bsheet-item {
+    color: var(--muted);
+    font-weight: 500;
+  }
+  @keyframes bsheet-in {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+  }
+
+  /* ---- customer site: slim top bar (logo + theme), everything else lives in the bottom bar */
+  .header-actions .hide-mobile,
+  .main-nav {
+    display: none;
+  }
+  .fab {
+    display: none;
+  }
+  .footer {
+    padding-bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom) + 12px);
+  }
+  .hero {
+    min-height: max(560px, calc(100svh - var(--bnav-h) - env(safe-area-inset-bottom)));
+  }
+  .tabs-glass {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-glass::-webkit-scrollbar {
+    display: none;
+  }
+  .tabs-glass .tab {
+    flex: 1 0 84px;
+  }
+
+  /* ---- owner panel: the sidebar is replaced by the bottom bar */
+  .adm-side,
+  .adm-scrim,
+  .adm-iconbtn.adm-menu {
+    display: none;
+  }
+  .adm-main {
+    padding-bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom) + 24px);
+  }
+  .adm-toast {
+    bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom) + 12px);
+  }
+  .adm-head-title h1 {
+    font-size: 1.3rem;
+  }
+  /* three numbers side by side, storage note below */
+  .adm-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .adm-stats > .adm-stat:last-child {
+    grid-column: 1 / -1;
+  }
+  .adm-stats > button.adm-stat {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 12px;
+  }
+  .adm-stats > button.adm-stat .adm-stat-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+  }
+  .adm-stats > button.adm-stat .adm-stat-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+@media (max-width: 480px) {
+  .adm-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Product page on phones: the main button is a bar fixed to the bottom of the screen (thumb reach). */
+.pp-cta {
+  display: none;
+}
+@media (max-width: 760px) {
+  .pp-info > .btn-wa {
+    display: none;
+  }
+  .pp-cta {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    display: block;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--header-bg);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.12);
+  }
+  .pp-cta .btn {
+    width: 100%;
+  }
+  .pp {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+}
+
+/* The owner panel resets button fonts (`.adm button`), so the bar and sheet text rules need a bit more weight. */
+@media (max-width: 760px) {
+  .bnav .bnav-item {
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .bsheet .bsheet-item {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .bsheet .bsheet-links .bsheet-item {
+    font-weight: 500;
+  }
+}
+
+/* Very small phones (320px): a little more room in the hero and slimmer buttons so two fit side by side. */
+@media (max-width: 380px) {
+  .hero {
+    min-height: max(640px, calc(100svh - var(--bnav-h) - env(safe-area-inset-bottom)));
+  }
+  .slide-actions {
+    gap: 8px;
+  }
+  .slide-actions .btn {
+    padding: 0 8px;
+    gap: 6px;
+    font-size: 0.86rem;
+  }
+  .slide-actions .btn-icon {
+    width: 18px;
+    height: 18px;
+  }
+  .slide-title {
+    font-size: clamp(1.7rem, 9vw, 2.2rem);
   }
 }

@@ -8,6 +8,7 @@ import { LogoMark } from "../Icons";
 import ThemeToggle from "../ThemeToggle";
 import { createActions } from "./actions";
 import AccountPanel from "./AccountPanel";
+import AdminBottomNav from "./AdminBottomNav";
 import AdmIcon, { type AdmIconName } from "./AdmIcons";
 import CategoriesPanel from "./CategoriesPanel";
 import CategoryForm from "./CategoryForm";
@@ -18,6 +19,7 @@ import ProductForm from "./ProductForm";
 import ProductsPanel from "./ProductsPanel";
 import VideoForm from "./VideoForm";
 import VideosPanel from "./VideosPanel";
+import WebsitePanel from "./WebsitePanel";
 
 type Toast = { kind: "ok" | "error"; text: string } | null;
 type Editor =
@@ -36,13 +38,17 @@ const NAV: { id: View; label: string; icon: AdmIconName }[] = [
   { id: "videos", label: "Videos", icon: "videos" },
 ];
 
-const SETTINGS_NAV: { id: View; label: string; icon: AdmIconName }[] = [{ id: "account", label: "Account", icon: "key" }];
+const SETTINGS_NAV: { id: View; label: string; icon: AdmIconName }[] = [
+  { id: "website", label: "Website", icon: "edit" },
+  { id: "account", label: "Account", icon: "key" },
+];
 
 const HEAD: Record<View, { title: string; subtitle: string }> = {
   dashboard: { title: "Dashboard", subtitle: "Overview of your website" },
   products: { title: "Products", subtitle: "Add, edit and re-order your designs" },
   categories: { title: "Categories & navigation", subtitle: "These are the tabs on your website" },
   videos: { title: "Videos", subtitle: "YouTube videos shown on your website" },
+  website: { title: "Website", subtitle: "The name shown on your website" },
   account: { title: "Account", subtitle: "Change your password and set up a recovery key" },
 };
 
@@ -50,11 +56,9 @@ const HEAD: Record<View, { title: string; subtitle: string }> = {
 export default function AdminApp({
   initialCatalog,
   initialMode,
-  brand,
 }: {
   initialCatalog: StoredCatalog;
   initialMode: StorageMode;
-  brand: string;
 }) {
   const router = useRouter();
   const [catalog, setCatalog] = useState(initialCatalog);
@@ -173,7 +177,7 @@ export default function AdminApp({
         <div className="adm-side-brand">
           <LogoMark className="logo-mark" />
           <span>
-            <strong>{brand}</strong>
+            <strong>{catalog.brand}</strong>
             <small>Owner panel</small>
           </span>
         </div>
@@ -281,6 +285,7 @@ export default function AdminApp({
               onDelete={askDeleteCategory}
             />
           )}
+          {view === "website" && <WebsitePanel key={catalog.brand} brand={catalog.brand} saving={saving} onSave={actions.saveBrand} />}
           {view === "account" && <AccountPanel mode={mode} onSignedOut={goToLogin} notify={showToast} />}
           {view === "videos" && (
             <VideosPanel
@@ -294,6 +299,8 @@ export default function AdminApp({
           )}
         </main>
       </div>
+
+      <AdminBottomNav main={NAV} more={SETTINGS_NAV} view={view} onOpen={open} onLogout={logout} />
 
       {editor?.kind === "product" && (
         <Modal title={editor.item ? "Edit product" : "Add a product"} onClose={closeEditor}>

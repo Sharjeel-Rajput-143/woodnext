@@ -5,6 +5,7 @@ import http from "node:http";
 import https from "node:https";
 import path from "node:path";
 import { withLabels, type Catalog, type StoredCatalog } from "./products";
+import { SITE } from "./site";
 import { sanitizeCatalog } from "./validate";
 
 /**
@@ -38,6 +39,7 @@ export class CatalogError extends Error {
 
 const EMPTY: StoredCatalog = {
   rev: 0,
+  brand: SITE.brand,
   categories: [{ id: "designs", label: "Designs", name: "Designs", icon: "tag" }],
   products: [],
   videos: [],

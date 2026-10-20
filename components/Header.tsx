@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { SITE } from "@/lib/site";
+import { useBrand } from "./BrandProvider";
 import { CloseIcon, HeartIcon, LogoMark, SearchIcon, WhatsAppIcon } from "./Icons";
 import { scrollToProducts, useShop } from "./ShopProvider";
 import ThemeToggle from "./ThemeToggle";
 import WhatsAppLink from "./WhatsAppLink";
 
 export default function Header() {
-  const { categories, videos, category, select, query, setQuery, showSaved, toggleSavedView, savedIds } = useShop();
+  const brand = useBrand();
+  const { categories, videos, category, select, query, setQuery, searchOpen, setSearchOpen, showSaved, toggleSavedView, savedIds } = useShop();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const searchInput = useRef<HTMLInputElement>(null);
   const browsing = !query && !showSaved;
   const solid = scrolled || menuOpen || searchOpen;
@@ -33,7 +33,7 @@ export default function Header() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [menuOpen, searchOpen]);
+  }, [menuOpen, searchOpen, setSearchOpen]);
 
   useEffect(() => {
     if (searchOpen) searchInput.current?.focus();
@@ -56,7 +56,7 @@ export default function Header() {
       <div className="container header-bar">
         <a href="#top" className="logo" onClick={() => setMenuOpen(false)}>
           <LogoMark className="logo-mark" />
-          <span>{SITE.brand}</span>
+          <span>{brand}</span>
         </a>
 
         <nav id="main-nav" className={`main-nav${menuOpen ? " open" : ""}`} aria-label="Primary">
@@ -93,7 +93,7 @@ export default function Header() {
         <div className="header-actions">
           <button
             type="button"
-            className={`icon-btn${searchOpen ? " is-active" : ""}`}
+            className={`icon-btn hide-mobile${searchOpen ? " is-active" : ""}`}
             aria-label="Search designs"
             aria-expanded={searchOpen}
             onClick={() => {
@@ -106,7 +106,7 @@ export default function Header() {
           <ThemeToggle />
           <button
             type="button"
-            className={`icon-btn${showSaved ? " is-active" : ""}`}
+            className={`icon-btn hide-mobile${showSaved ? " is-active" : ""}`}
             aria-label={`Saved designs (${savedIds.length})`}
             aria-pressed={showSaved}
             onClick={() => {
@@ -118,13 +118,13 @@ export default function Header() {
             <HeartIcon filled={showSaved} />
             {savedIds.length > 0 && <span className="icon-badge">{savedIds.length}</span>}
           </button>
-          <WhatsAppLink className="btn btn-wa btn-sm header-wa">
+          <WhatsAppLink className="btn btn-wa btn-sm header-wa hide-mobile">
             <WhatsAppIcon className="btn-icon" />
             WhatsApp
           </WhatsAppLink>
           <button
             type="button"
-            className="menu-btn"
+            className="menu-btn hide-mobile"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="main-nav"

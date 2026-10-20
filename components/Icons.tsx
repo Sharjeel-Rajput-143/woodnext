@@ -36,6 +36,26 @@ export function SearchIcon({ className }: IconProps) {
   );
 }
 
+export function HomeIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
+      <path d="M3 11l9-7.5 9 7.5" />
+      <path d="M5.5 9.5V19a1 1 0 0 0 1 1H10v-5.5h4V20h3.5a1 1 0 0 0 1-1V9.5" />
+    </svg>
+  );
+}
+
+export function GridIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
+      <rect x="3.5" y="3.5" width="7" height="7" rx="1.8" />
+      <rect x="13.5" y="3.5" width="7" height="7" rx="1.8" />
+      <rect x="3.5" y="13.5" width="7" height="7" rx="1.8" />
+      <rect x="13.5" y="13.5" width="7" height="7" rx="1.8" />
+    </svg>
+  );
+}
+
 export function CloseIcon({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">

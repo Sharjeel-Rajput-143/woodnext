@@ -35,9 +35,9 @@ function productLink(product: Product): string | null {
   return product.image.startsWith("http") ? product.image : null;
 }
 
-export function productWhatsappUrl(product: Product, ad?: AdSource): string {
+export function productWhatsappUrl(product: Product, brand: string, ad?: AdSource): string {
   const lines = [
-    `Hello ${SITE.brand}! 👋`,
+    `Hello ${brand}! 👋`,
     "I'd like to know the price of this product:",
     "",
     `*Product:* ${product.title}`,
@@ -54,9 +54,9 @@ export function productWhatsappUrl(product: Product, ad?: AdSource): string {
   return chatUrl(lines.join("\n"));
 }
 
-export function generalWhatsappUrl(ad?: AdSource): string {
+export function generalWhatsappUrl(brand: string, ad?: AdSource): string {
   const lines = [
-    `Hello ${SITE.brand}! 👋`,
+    `Hello ${brand}! 👋`,
     "I'm interested in your wood designs (beds, kitchens, doors). Please share more details.",
   ];
   const source = sourceLine(ad);

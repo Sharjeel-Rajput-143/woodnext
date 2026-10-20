@@ -152,14 +152,14 @@ export function CtaBand() {
   );
 }
 
-export function Footer({ categories }: { categories: Category[] }) {
+export function Footer({ brand, categories }: { brand: string; categories: Category[] }) {
   return (
     <footer className="footer">
       <div className="container footer-grid">
         <div className="footer-brand">
           <a href="#top" className="logo">
             <LogoMark className="logo-mark" />
-            <span>{SITE.brand}</span>
+            <span>{brand}</span>
           </a>
           <p>{SITE.tagline}. Solid wood beds, kitchens and doors, made to measure.</p>
         </div>
@@ -202,7 +202,7 @@ export function Footer({ categories }: { categories: Category[] }) {
         </div>
       </div>
       <div className="container footer-bottom">
-        © {new Date().getFullYear()} {SITE.brand}. All rights reserved.
+        © {new Date().getFullYear()} {brand}. All rights reserved.
       </div>
     </footer>
   );

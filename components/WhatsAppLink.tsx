@@ -2,6 +2,7 @@
 
 import { useMemo, type MouseEvent, type ReactNode } from "react";
 import type { Product } from "@/lib/products";
+import { useBrand } from "./BrandProvider";
 import { generalWhatsappUrl, productWhatsappUrl, readAdSource } from "@/lib/whatsapp";
 
 type Props = {
@@ -15,17 +16,18 @@ type Props = {
 type FbqWindow = Window & { fbq?: (...args: unknown[]) => void };
 
 export default function WhatsAppLink({ product, className, tabIndex, children }: Props) {
+  const brand = useBrand();
   const href = useMemo(
-    () => (product ? productWhatsappUrl(product) : generalWhatsappUrl()),
-    [product],
+    () => (product ? productWhatsappUrl(product, brand) : generalWhatsappUrl(brand)),
+    [product, brand],
   );
 
   // Add Meta ad / UTM info at click time (the page is statically rendered, so it is not known earlier).
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
     const ad = readAdSource(window.location.search);
     event.currentTarget.href = product
-      ? productWhatsappUrl(product, ad)
-      : generalWhatsappUrl(ad);
+      ? productWhatsappUrl(product, brand, ad)
+      : generalWhatsappUrl(brand, ad);
 
     // Reports the lead to the Meta Pixel when one is installed on the site.
     (window as FbqWindow).fbq?.("track", "Contact", {

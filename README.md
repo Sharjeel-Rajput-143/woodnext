@@ -32,6 +32,18 @@ Only the owner can log in. Customers never see it. From the panel you can add, e
 
 Data lives in `data/catalog.json` (photos in `data/uploads/`).
 
+### Website name
+
+**Website** in the sidebar (or under **More** on a phone) changes the name shown in the top bar, footer, browser tab, link
+previews and the first line of every WhatsApp message. It is saved with the rest of the site data. The logo picture is a file
+(`public/` and `app/icon.png`), so it does not change with the name.
+
+### On phones
+
+Phones (up to 760px wide) get a **bottom navigation bar** on both the website and the owner panel, so everything is within
+thumb reach. Website: Home, Designs (all categories and sections), Search, Saved, WhatsApp. Owner panel: Dashboard, Products,
+Categories, Videos, More (Website, Account, View website, Log out). Tablets and desktops keep the top bar / sidebar.
+
 ### Login
 
 The owner login is built in (username `Waqar`; the password is stored only as a hash in `lib/credentials.ts`).

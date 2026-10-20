@@ -39,12 +39,15 @@ export type Video = {
 export type StoredCatalog = {
   /** Increases on every save; used to detect two people editing at once. */
   rev: number;
+  /** The website name shown in the header, footer, page titles and WhatsApp messages. Edited in the admin panel. */
+  brand: string;
   categories: Category[];
   products: StoredProduct[];
   videos: Video[];
 };
 
 export type Catalog = {
+  brand: string;
   categories: Category[];
   products: Product[];
   videos: Video[];
@@ -53,6 +56,7 @@ export type Catalog = {
 export function withLabels(stored: StoredCatalog): Catalog {
   const labels = new Map(stored.categories.map((c) => [c.id, c.label]));
   return {
+    brand: stored.brand,
     categories: stored.categories,
     videos: stored.videos,
     products: stored.products.map((p) => ({ ...p, categoryLabel: labels.get(p.category) ?? p.category })),

@@ -1,3 +1,4 @@
+import { SITE } from "./site";
 import { ICONS, type Category, type IconName, type StoredCatalog, type StoredProduct, type Video } from "./products";
 import { parseYouTubeId } from "./youtube";
 
@@ -9,6 +10,17 @@ const UPLOAD = /^\/uploads\/[a-f0-9]{16}\.(?:jpg|png|webp)$/;
 
 const text = (value: unknown, max: number): string | null =>
   typeof value === "string" ? value.trim().slice(0, max) : null;
+
+export const BRAND_MAX = 40;
+
+/** Cleans the website name: no control characters, single spaces. Returns an error message for an unusable name. */
+export function cleanBrand(value: unknown): { ok: true; value: string } | { ok: false; error: string } {
+  if (typeof value !== "string") return { ok: false, error: "Enter a name for your website." };
+  const brand = value.replace(/[\u0000-\u001f\u007f<>]/g, " ").replace(/\s+/g, " ").trim();
+  if (brand.length < 2) return { ok: false, error: "The website name needs at least 2 characters." };
+  if (brand.length > BRAND_MAX) return { ok: false, error: `The website name can be at most ${BRAND_MAX} characters.` };
+  return { ok: true, value: brand };
+}
 
 /**
  * Strictly validates (and cleans) a catalog coming from the admin panel or the JSON file.
@@ -79,6 +91,10 @@ export function sanitizeCatalog(input: unknown): Result {
     videos.push({ id, title, description, youtubeId });
   }
 
+  // Older data files have no name yet: they keep the built-in one until the owner changes it.
+  const brand = raw.brand === undefined ? { ok: true as const, value: SITE.brand } : cleanBrand(raw.brand);
+  if (!brand.ok) return brand;
+
   const rev = typeof raw.rev === "number" && Number.isFinite(raw.rev) ? Math.max(0, Math.floor(raw.rev)) : 0;
-  return { ok: true, value: { rev, categories, products, videos } };
+  return { ok: true, value: { rev, brand: brand.value, categories, products, videos } };
 }

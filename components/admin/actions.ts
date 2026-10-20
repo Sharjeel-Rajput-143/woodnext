@@ -10,6 +10,11 @@ export function createActions(catalog: StoredCatalog, commit: Commit) {
   }
 
   return {
+    // ----- website
+    saveBrand(brand: string) {
+      return commit({ ...catalog, brand }, "Website name updated.");
+    },
+
     // ----- products
     saveProduct(product: StoredProduct) {
       const exists = catalog.products.some((p) => p.id === product.id);

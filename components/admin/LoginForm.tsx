@@ -2,13 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { SITE } from "@/lib/site";
+import { useBrand } from "../BrandProvider";
 import { LogoMark } from "../Icons";
 import ForgotForm from "./ForgotForm";
 import PasswordInput from "./PasswordInput";
 
 export default function LoginForm() {
   const router = useRouter();
+  const brand = useBrand();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [forgot, setForgot] = useState(false);
@@ -45,7 +46,7 @@ export default function LoginForm() {
       <form className="adm-login-card" method="post" onSubmit={onSubmit}>
         <div className="adm-login-brand">
           <LogoMark className="logo-mark" />
-          <span>{SITE.brand}</span>
+          <span>{brand}</span>
         </div>
         <h1>Owner login</h1>
         <p className="adm-muted">Only the website owner can sign in here.</p>

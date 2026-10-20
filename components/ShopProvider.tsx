@@ -19,6 +19,9 @@ type ShopContextValue = {
   select: (id: string) => void;
   query: string;
   setQuery: (value: string) => void;
+  /** The search box under the header (opened from the header, or from the bottom bar on phones). */
+  searchOpen: boolean;
+  setSearchOpen: (open: boolean | ((open: boolean) => boolean)) => void;
   showSaved: boolean;
   toggleSavedView: () => void;
   savedIds: string[];
@@ -57,6 +60,7 @@ export default function ShopProvider({
   const [category, setCategory] = useState(initialCategory);
   const [query, setQueryState] = useState("");
   const [showSaved, setShowSaved] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { ids: storedIds, toggle: toggleSave } = useSavedIds();
   // Ignore saved designs that were deleted from the catalog.
   const savedIds = useMemo(
@@ -96,13 +100,15 @@ export default function ShopProvider({
       select,
       query,
       setQuery,
+      searchOpen,
+      setSearchOpen,
       showSaved,
       toggleSavedView,
       savedIds,
       isSaved: (id) => savedIds.includes(id),
       toggleSave,
     }),
-    [categories, products, videos, category, select, query, setQuery, showSaved, toggleSavedView, savedIds, toggleSave],
+    [categories, products, videos, category, select, query, setQuery, searchOpen, showSaved, toggleSavedView, savedIds, toggleSave],
   );
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

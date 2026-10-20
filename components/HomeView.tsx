@@ -1,4 +1,5 @@
 import CategoryTiles from "@/components/CategoryTiles";
+import BottomNav from "@/components/BottomNav";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ProductsSection from "@/components/ProductsSection";
@@ -32,8 +33,9 @@ export default function HomeView({ catalog, initialCategory }: { catalog: Catalo
         <HowItWorks />
         <CtaBand />
       </main>
-      <Footer categories={catalog.categories} />
+      <Footer brand={catalog.brand} categories={catalog.categories} />
       <WhatsAppFab />
+      <BottomNav />
     </ShopProvider>
   );
 }

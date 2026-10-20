@@ -71,7 +71,7 @@ async function gh(pathname: string, init: RequestInit & { raw?: boolean } = {}) 
   return res;
 }
 
-async function ghRead(pathname: string): Promise<{ text: string; sha: string } | null> {
+export async function ghRead(pathname: string): Promise<{ text: string; sha: string } | null> {
   const res = await gh(pathname);
   if (res.status === 404) {
     await res.body?.cancel();
@@ -85,7 +85,7 @@ async function ghRead(pathname: string): Promise<{ text: string; sha: string } |
   return { text: Buffer.from(json.content, "base64").toString("utf8"), sha: json.sha };
 }
 
-async function ghWrite(pathname: string, content: Buffer, message: string, sha?: string) {
+export async function ghWrite(pathname: string, content: Buffer, message: string, sha?: string) {
   const { branch } = ghRepo();
   const res = await gh(pathname, {
     method: "PUT",

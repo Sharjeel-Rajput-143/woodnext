@@ -1,7 +1,7 @@
 # WoodNext landing page
 
 Landing page for ads (Meta / Instagram). Visitors browse Bed, Kitchen and Door designs; each product has a
-**Get Price** button that opens WhatsApp (+92 319 2304193) with the selected product and its details pre-filled.
+**Get Price** button that opens WhatsApp (+92 345 5096301) with the selected product and its details pre-filled.
 
 Built with Next.js (App Router) + TypeScript. No database or API keys needed.
 
@@ -34,9 +34,26 @@ Data lives in `data/catalog.json` (photos in `data/uploads/`).
 
 ### Login
 
-The owner login is built in (username `Waqar`; the password is stored only as a hash in `lib/auth.ts`).
-To use your own, set `ADMIN_USERNAME`, `ADMIN_PASSWORD` and `SESSION_SECRET` (random text, 32+ characters) as
-environment variables; they override the built-in login. Open `/admin` to sign in.
+The owner login is built in (username `Waqar`; the password is stored only as a hash in `lib/credentials.ts`).
+Open `/admin` to sign in. The login comes from the first of these that exists:
+
+1. **A password set from the panel** (saved as hashes in `data/auth.json`). Wins over everything below.
+2. `ADMIN_USERNAME` / `ADMIN_PASSWORD` environment variables.
+3. The built-in login.
+
+Set `SESSION_SECRET` (random text, 32+ characters) in the hosting settings so login cookies can't be forged.
+
+**Change password.** Signed in, open **Account** in the sidebar: enter the current password and a new one (10+ characters).
+Other devices are signed out.
+
+**Forgot password.** The login page has a **Forgot password?** link. It asks for the username, the **recovery key** and a new
+password. The owner creates the recovery key once from **Account → Recovery key** (it is shown only once, so write it down).
+Each recovery key works once; resetting the password shows a fresh one. There is no email step, so a lost password *and* lost
+recovery key means someone with hosting access has to reset the login: delete `data/auth.json` (on Vercel: delete it from the
+GitHub repo) to go back to the environment variables / built-in login, or set a new password in `ADMIN_PASSWORD`.
+
+On Vercel the new password is saved by committing `data/auth.json` to the GitHub repo (the same `GITHUB_TOKEN` as for products,
+see below), so keep that repo **private**: it holds password hashes. Without `GITHUB_TOKEN` the Account page is read-only.
 
 ### Saving on Vercel
 

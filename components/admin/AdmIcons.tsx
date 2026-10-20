@@ -1,6 +1,6 @@
 export type AdmIconName =
   | "dashboard" | "products" | "categories" | "videos" | "external" | "logout" | "menu" | "plus"
-  | "edit" | "trash" | "up" | "down" | "eye" | "check" | "cloud" | "image" | "close" | "search" | "eyeOff" | "back";
+  | "edit" | "trash" | "up" | "down" | "eye" | "check" | "cloud" | "image" | "close" | "search" | "eyeOff" | "back" | "key";
 
 const PATHS: Record<AdmIconName, React.ReactNode> = {
   dashboard: (
@@ -66,6 +66,12 @@ const PATHS: Record<AdmIconName, React.ReactNode> = {
     </>
   ),
   close: <path d="M6 6l12 12M18 6L6 18" />,
+  key: (
+    <>
+      <circle cx="8" cy="15" r="4" />
+      <path d="M11 12l9-9M16 7l3 3M14 9l2 2" />
+    </>
+  ),
   search: (
     <>
       <circle cx="11" cy="11" r="6.5" />

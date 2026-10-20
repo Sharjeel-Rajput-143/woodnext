@@ -1,12 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { StorageMode } from "@/lib/catalog";
 import type { Category, StoredCatalog, StoredProduct, Video } from "@/lib/products";
 import { LogoMark } from "../Icons";
 import ThemeToggle from "../ThemeToggle";
 import { createActions } from "./actions";
+import AccountPanel from "./AccountPanel";
 import AdmIcon, { type AdmIconName } from "./AdmIcons";
 import CategoriesPanel from "./CategoriesPanel";
 import CategoryForm from "./CategoryForm";
@@ -35,11 +36,14 @@ const NAV: { id: View; label: string; icon: AdmIconName }[] = [
   { id: "videos", label: "Videos", icon: "videos" },
 ];
 
+const SETTINGS_NAV: { id: View; label: string; icon: AdmIconName }[] = [{ id: "account", label: "Account", icon: "key" }];
+
 const HEAD: Record<View, { title: string; subtitle: string }> = {
   dashboard: { title: "Dashboard", subtitle: "Overview of your website" },
   products: { title: "Products", subtitle: "Add, edit and re-order your designs" },
   categories: { title: "Categories & navigation", subtitle: "These are the tabs on your website" },
   videos: { title: "Videos", subtitle: "YouTube videos shown on your website" },
+  account: { title: "Account", subtitle: "Change your password and set up a recovery key" },
 };
 
 /** The owner's control panel: sidebar, header and pages for products, categories (navigation) and videos. */
@@ -71,6 +75,7 @@ export default function AdminApp({
   }, [toast]);
 
   const showToast = setToast;
+  const goToLogin = useCallback(() => router.replace("/admin/login"), [router]);
 
   const commit: Commit = async (next, successText) => {
     setSaving(true);
@@ -194,6 +199,22 @@ export default function AdminApp({
           ))}
         </nav>
 
+        <nav className="adm-nav" aria-label="Settings">
+          <span className="adm-nav-label">Settings</span>
+          {SETTINGS_NAV.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`adm-nav-item${view === item.id ? " is-active" : ""}`}
+              aria-current={view === item.id ? "page" : undefined}
+              onClick={() => open(item.id)}
+            >
+              <AdmIcon name={item.icon} />
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
         <div className="adm-side-foot">
           <a className="adm-nav-item" href="/" target="_blank" rel="noopener noreferrer">
             <AdmIcon name="external" />
@@ -260,6 +281,7 @@ export default function AdminApp({
               onDelete={askDeleteCategory}
             />
           )}
+          {view === "account" && <AccountPanel mode={mode} onSignedOut={goToLogin} notify={showToast} />}
           {view === "videos" && (
             <VideosPanel
               catalog={catalog}

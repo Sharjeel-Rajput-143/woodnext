@@ -6,7 +6,7 @@ import { youtubeThumb } from "@/lib/youtube";
 import imageLoader from "@/lib/image-loader";
 import AdmIcon, { type AdmIconName } from "./AdmIcons";
 
-export type View = "dashboard" | "products" | "categories" | "videos";
+export type View = "dashboard" | "products" | "categories" | "videos" | "account";
 
 const STORAGE_TEXT: Record<StorageMode, { title: string; text: string }> = {
   github: {

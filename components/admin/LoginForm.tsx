@@ -4,13 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { SITE } from "@/lib/site";
 import { LogoMark } from "../Icons";
-import AdmIcon from "./AdmIcons";
+import ForgotForm from "./ForgotForm";
+import PasswordInput from "./PasswordInput";
 
 export default function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [forgot, setForgot] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,6 +38,8 @@ export default function LoginForm() {
     }
   }
 
+  if (forgot) return <ForgotForm onBack={() => setForgot(false)} />;
+
   return (
     <main className="adm-login">
       <form className="adm-login-card" method="post" onSubmit={onSubmit}>
@@ -52,23 +55,7 @@ export default function LoginForm() {
         </label>
         <label className="adm-field">
           <span>Password</span>
-          <span className="adm-pass">
-            <input
-              name="password"
-              type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
-              required
-            />
-            <button
-              type="button"
-              className="adm-pass-toggle"
-              aria-label={showPassword ? "Hide password" : "Show password"}
-              aria-pressed={showPassword}
-              onClick={() => setShowPassword((v) => !v)}
-            >
-              <AdmIcon name={showPassword ? "eyeOff" : "eye"} />
-            </button>
-          </span>
+          <PasswordInput name="password" autoComplete="current-password" required />
         </label>
         {error && (
           <p className="adm-alert adm-alert-error" role="alert">
@@ -77,6 +64,9 @@ export default function LoginForm() {
         )}
         <button type="submit" className="btn btn-dark btn-block" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
+        </button>
+        <button type="button" className="adm-link adm-login-link" onClick={() => setForgot(true)}>
+          Forgot password?
         </button>
       </form>
     </main>

@@ -2751,6 +2751,52 @@ button.adm-stat:hover {
   height: 20px;
 }
 
+/* ---- account page, recovery key */
+.adm-alert-ok {
+  background: var(--ok-bg);
+  color: var(--ok-ink);
+}
+.adm-account {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 560px;
+}
+.adm-account .adm-card-title {
+  margin-bottom: 6px;
+}
+.adm-account .adm-form {
+  margin-top: 14px;
+}
+.adm-login-link {
+  align-self: center;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.92rem;
+}
+.adm-key-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 14px;
+}
+.adm-key {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: var(--soft);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  word-break: break-all;
+  user-select: all;
+  color: var(--heading);
+}
+
 /* ---- responsive */
 @media (max-width: 1100px) {
   .adm-stats {

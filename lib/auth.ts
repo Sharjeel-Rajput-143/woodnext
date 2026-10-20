@@ -8,7 +8,7 @@ const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 // Built-in owner login. The ADMIN_USERNAME / ADMIN_PASSWORD / SESSION_SECRET environment variables
 // override these if you set them. The password is stored only as a scrypt hash, never as plain text.
 const DEFAULT_USERNAME = "Waqar";
-const DEFAULT_PASSWORD_HASH = "scrypt:a1592f02506b5728a686d292f9b198ff:6ab58b2f9b45afc4dc569cd7f74c4003579d43b06122d8b2735ced9a6a64a4fcc1de98d1f0e7cfc3bc09da2c268066f5de7e5087834e99d29a3575ac975f82d1";
+const DEFAULT_PASSWORD_HASH = "scrypt:36e4854071583bdd97ffd345e5c1536d:0f0a75a5cd9a94b2d864832d2e1771b79c81afe37144abe4a7ac24e2014d0da0b674ccc9166852840f524382465ab716576fd70bb9b0e0055dc406dde39fbde8";
 const DEFAULT_SESSION_SECRET = "18c654852d9b6224b3d74d777ae4f6a6d0cbf121d02156ce3f71a4cef7c637c2";
 
 const secret = () => {

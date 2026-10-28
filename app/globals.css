@@ -3386,3 +3386,45 @@ button.adm-cell-main:hover strong {
     font-size: clamp(1.7rem, 9vw, 2.2rem);
   }
 }
+
+/* ---- product cards open the details page (/p/<id>) ---- */
+.card {
+  position: relative;
+}
+.card-link {
+  color: inherit;
+  text-decoration: none;
+}
+/* Stretched link: the whole card is clickable. The heart and the WhatsApp button sit above it. */
+.card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: var(--radius);
+}
+.card-link:focus-visible {
+  outline: none;
+}
+.card-link:focus-visible::after {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+.card .heart {
+  z-index: 2;
+}
+.card-body .btn {
+  position: relative;
+  z-index: 2;
+}
+.card-more {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.card:hover .card-title {
+  color: var(--accent);
+}
+.card:hover .card-media .media-img {
+  transform: scale(1.04);
+}

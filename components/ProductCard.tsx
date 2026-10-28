@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { Product } from "@/lib/products";
 import { HeartIcon, WhatsAppIcon } from "./Icons";
 import ProductImage from "./ProductImage";
@@ -31,8 +32,16 @@ export default function ProductCard({ product, index }: { product: Product; inde
       </div>
       <div className="card-body">
         <p className="card-cat">{product.categoryLabel}</p>
-        <h3 className="card-title">{product.title}</h3>
+        <h3 className="card-title">
+          {/* One link covers the whole card (see .card-link in the CSS), so a click or tap anywhere opens the details page. */}
+          <Link href={`/p/${product.id}`} className="card-link">
+            {product.title}
+          </Link>
+        </h3>
         <p className="card-desc">{product.description}</p>
+        <p className="card-more" aria-hidden="true">
+          View details →
+        </p>
         <p className="card-price">Price on WhatsApp</p>
         <WhatsAppLink product={product} className="btn btn-wa btn-block">
           <WhatsAppIcon className="btn-icon" />

@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useBrand } from "../BrandProvider";
-import { LogoMark } from "../Icons";
+import AnimatedLogo from "./AnimatedLogo";
 import PasswordInput from "./PasswordInput";
 import RecoveryKeyBox from "./RecoveryKeyBox";
 
 /** "Forgot password": username + recovery key + new password. */
 export default function ForgotForm({ onBack }: { onBack: () => void }) {
-  const brand = useBrand();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [newKey, setNewKey] = useState("");
@@ -42,10 +40,7 @@ export default function ForgotForm({ onBack }: { onBack: () => void }) {
   return (
     <main className="adm-login">
       <form className="adm-login-card" method="post" onSubmit={onSubmit}>
-        <div className="adm-login-brand">
-          <LogoMark className="logo-mark" />
-          <span>{brand}</span>
-        </div>
+        <AnimatedLogo />
         {newKey ? (
           <>
             <h1>Password changed</h1>

@@ -258,7 +258,8 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
   font-family: var(--font-sans-stack);
   font-size: 1.45rem;
   font-weight: 800;
@@ -472,7 +473,7 @@ button {
   height: 18px;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1240px) {
   .header-bar {
     gap: 14px;
   }
@@ -1502,6 +1503,11 @@ button {
   color: #fff;
 }
 .footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
   padding-top: 20px;
   padding-bottom: 96px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -3427,4 +3433,48 @@ button.adm-cell-main:hover strong {
 }
 .card:hover .card-media .media-img {
   transform: scale(1.04);
+}
+
+/* ---- long website names: shorten with "…" instead of pushing the buttons off the screen ---- */
+.logo > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.logo-mark {
+  flex: none;
+}
+@media (max-width: 380px) {
+  .logo {
+    gap: 8px;
+    font-size: 1.05rem;
+  }
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+  }
+}
+@media (max-width: 480px) {
+  .pp-bar .btn-icon {
+    display: none;
+  }
+  .pp-bar .btn {
+    padding: 0 14px;
+  }
+}
+@media (min-width: 381px) and (max-width: 480px) {
+  .logo {
+    font-size: 1.1rem;
+  }
+}
+
+.footer-admin {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.8;
+}
+.footer-admin:hover {
+  text-decoration: underline;
+  opacity: 1;
 }

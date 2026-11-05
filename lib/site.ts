@@ -1,6 +1,6 @@
 export const SITE = {
   // Default website name. The owner can change it from the admin panel (Website), which then takes over.
-  brand: "WoodNext",
+  brand: "Wood Designer Studio",
   tagline: "Handcrafted wood furniture",
   // International format, digits only: +92 345 5096301 -> 923455096301
   whatsappNumber: "923455096301",

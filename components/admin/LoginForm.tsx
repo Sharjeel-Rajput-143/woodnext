@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useBrand } from "../BrandProvider";
@@ -69,6 +70,9 @@ export default function LoginForm() {
         <button type="button" className="adm-link adm-login-link" onClick={() => setForgot(true)}>
           Forgot password?
         </button>
+        <Link href="/" className="adm-link adm-login-link">
+          ← Back to website
+        </Link>
       </form>
     </main>
   );

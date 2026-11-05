@@ -1,12 +1,10 @@
 import type { NextConfig } from "next";
 
-// The live site address, used in WhatsApp messages. Set NEXT_PUBLIC_SITE_URL to override;
-// on Vercel it is picked up automatically from the project's production domain.
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "");
+// The live site address (the custom domain). It is used in WhatsApp messages, link previews and page metadata.
+// On Vercel it defaults to the domain below; set NEXT_PUBLIC_SITE_URL to override it. Locally it stays empty.
+// (The apex domain wooddesignerstudio.com redirects to www, so the www address is the canonical one.)
+const PRODUCTION_URL = "https://www.wooddesignerstudio.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL ? PRODUCTION_URL : "");
 
 const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_SITE_URL: siteUrl },

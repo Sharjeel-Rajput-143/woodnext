@@ -9,11 +9,8 @@ import "./globals.css";
 const sans = DM_Sans({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const serif = Fraunces({ subsets: ["latin"], variable: "--font-serif", display: "swap" });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000");
+// Set in next.config.ts (the custom domain on Vercel).
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 // Applies the saved (or system) colour scheme before first paint to avoid a flash.
 const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
@@ -24,11 +21,13 @@ const description =
 // The website name comes from the admin panel, so the page titles are built from it.
 export async function generateMetadata(): Promise<Metadata> {
   const { brand } = await getCatalog();
-  const title = `${brand} | Custom Beds, Kitchens & Doors – Get Price on WhatsApp`;
+  const title = `${brand} | Custom Beds, Kitchens & Doors`;
   return {
     metadataBase: new URL(siteUrl),
     title,
     description,
+    // Pages with their own address (products, category tabs) override this.
+    alternates: { canonical: "/" },
     openGraph: { title, description, type: "website", siteName: brand },
   };
 }

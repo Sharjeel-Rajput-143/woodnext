@@ -1,4 +1,4 @@
-# WoodNext landing page
+# Wood Designer Studio (landing page)
 
 Landing page for ads (Meta / Instagram). Visitors browse Bed, Kitchen and Door designs; each product has a
 **Get Price** button that opens WhatsApp (+92 345 5096301) with the selected product and its details pre-filled.
@@ -32,7 +32,10 @@ Only the owner can log in. Customers never see it. From the panel you can add, e
 
 Data lives in `data/catalog.json` (photos in `data/uploads/`).
 
-### Website name
+### Website name and domain
+
+The site is live at **https://www.wooddesignerstudio.com** (the address without `www` redirects there). The website name is
+"Wood Designer Studio" by default.
 
 **Website** in the sidebar (or under **More** on a phone) changes the name shown in the top bar, footer, browser tab, link
 previews and the first line of every WhatsApp message. It is saved with the rest of the site data. The logo picture is a file

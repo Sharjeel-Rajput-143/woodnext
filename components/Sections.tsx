@@ -202,7 +202,13 @@ export function Footer({ brand, categories }: { brand: string; categories: Categ
         </div>
       </div>
       <div className="container footer-bottom">
-        © {new Date().getFullYear()} {brand}. All rights reserved.
+        <span>
+          © {new Date().getFullYear()} {brand}. All rights reserved.
+        </span>
+        {/* Owner sign-in only: the site has no customer accounts. A plain link so it is not pre-loaded; /admin sends signed-out visitors to the login page. */}
+        <a href="/admin" className="footer-admin" rel="nofollow">
+          Admin login
+        </a>
       </div>
     </footer>
   );

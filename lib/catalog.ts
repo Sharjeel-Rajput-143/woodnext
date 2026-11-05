@@ -276,7 +276,11 @@ export async function readUpload(name: string): Promise<{ data: Buffer; type: st
 /** Deletes uploaded photos that no product uses any more (local file mode only). */
 async function cleanupUploads(catalog: StoredCatalog) {
   try {
-    const used = new Set(catalog.products.map((p) => p.image.replace("/uploads/", "")));
+    const used = new Set(
+      [...catalog.products.map((p) => p.image), ...catalog.categories.map((k) => k.image ?? ""), ...Object.values(catalog.siteImages ?? {})].map((src) =>
+        src.replace("/uploads/", ""),
+      ),
+    );
     const hourAgo = Date.now() - 60 * 60 * 1000;
     for (const file of await fs.readdir(UPLOAD_DIR)) {
       if (!UPLOAD_NAME.test(file) || used.has(file)) continue;

@@ -38,8 +38,15 @@ The site is live at **https://www.wooddesignerstudio.com** (the address without 
 "Wood Designer Studio" by default.
 
 **Website** in the sidebar (or under **More** on a phone) changes the name shown in the top bar, footer, browser tab, link
-previews and the first line of every WhatsApp message. It is saved with the rest of the site data. The logo picture is a file
-(`public/` and `app/icon.png`), so it does not change with the name.
+previews and the first line of every WhatsApp message, and the three **section photos** on the home page (the large and small
+photos in "Furniture made to fit your home", and the background of "Can't find your perfect design?"). Each can be uploaded,
+pasted as a link, or reset to the original. The **top banner** uses the photos of the products in the selected category
+(change them under **Products**), and each category can have its own tile photo (**Categories → Edit**). All of this is saved
+with the rest of the site data.
+
+The logo is a set of files: `public/logo-mark.png` (header), `app/icon.png` and `app/apple-icon.png` (browser and phone
+icons), `app/opengraph-image.jpg` (link preview) and `public/logo-animated.gif` (animated logo on the owner sign-in screen,
+with `public/logo-full.png` as the still version for people who prefer reduced motion). To change the logo, replace those files.
 
 ### On phones
 

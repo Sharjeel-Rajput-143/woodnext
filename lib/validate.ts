@@ -1,5 +1,5 @@
 import { SITE } from "./site";
-import { ICONS, type Category, type IconName, type StoredCatalog, type StoredProduct, type Video } from "./products";
+import { ICONS, SITE_IMAGES, type Category, type IconName, type StoredCatalog, type StoredProduct, type Video } from "./products";
 import { parseYouTubeId } from "./youtube";
 
 type Result = { ok: true; value: StoredCatalog } | { ok: false; error: string };
@@ -7,6 +7,9 @@ type Result = { ok: true; value: StoredCatalog } | { ok: false; error: string };
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const CODE = /^[A-Za-z0-9][A-Za-z0-9-]{1,23}$/;
 const UPLOAD = /^\/uploads\/[a-f0-9]{16}\.(?:jpg|png|webp)$/;
+
+/** An https link or a photo uploaded in the admin panel. */
+const isPhoto = (src: string) => /^https:\/\/[^\s]+$/.test(src) || UPLOAD.test(src);
 
 const text = (value: unknown, max: number): string | null =>
   typeof value === "string" ? value.trim().slice(0, max) : null;
@@ -46,9 +49,11 @@ export function sanitizeCatalog(input: unknown): Result {
     const icon = ICONS.includes(c?.icon as IconName) ? (c.icon as IconName) : "tag";
     if (!id || !SLUG.test(id)) return { ok: false, error: "A category has an invalid id." };
     if (!label || !name) return { ok: false, error: "Every category needs a name and a label." };
+    const image = text(c?.image, 600);
+    if (image && !isPhoto(image)) return { ok: false, error: `The photo of "${name}" is not a valid link (use https or upload it).` };
     if (categoryIds.has(id)) return { ok: false, error: `Duplicate category "${name}".` };
     categoryIds.add(id);
-    categories.push({ id, label, name, icon });
+    categories.push({ id, label, name, icon, ...(image ? { image } : {}) });
   }
 
   const products: StoredProduct[] = [];
@@ -91,10 +96,20 @@ export function sanitizeCatalog(input: unknown): Result {
     videos.push({ id, title, description, youtubeId });
   }
 
+  const siteImages: Record<string, string> = {};
+  if (raw.siteImages && typeof raw.siteImages === "object") {
+    for (const { key, label } of SITE_IMAGES) {
+      const src = text((raw.siteImages as Record<string, unknown>)[key], 600);
+      if (!src) continue; // empty = use the original photo
+      if (!isPhoto(src)) return { ok: false, error: `The photo for "${label}" is not a valid link (use https or upload it).` };
+      siteImages[key] = src;
+    }
+  }
+
   // Older data files have no name yet: they keep the built-in one until the owner changes it.
   const brand = raw.brand === undefined ? { ok: true as const, value: SITE.brand } : cleanBrand(raw.brand);
   if (!brand.ok) return brand;
 
   const rev = typeof raw.rev === "number" && Number.isFinite(raw.rev) ? Math.max(0, Math.floor(raw.rev)) : 0;
-  return { ok: true, value: { rev, brand: brand.value, categories, products, videos } };
+  return { ok: true, value: { rev, brand: brand.value, categories, products, videos, ...(Object.keys(siteImages).length ? { siteImages } : {}) } };
 }

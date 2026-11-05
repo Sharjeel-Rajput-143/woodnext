@@ -1,4 +1,4 @@
-import type { Category, StoredCatalog, StoredProduct, Video } from "@/lib/products";
+import type { Category, SiteImageOverrides, StoredCatalog, StoredProduct, Video } from "@/lib/products";
 import type { Commit } from "./AdminApp";
 
 /** Every change the owner can make. Each one saves the whole catalog and resolves to `true` on success. */
@@ -13,6 +13,10 @@ export function createActions(catalog: StoredCatalog, commit: Commit) {
     // ----- website
     saveBrand(brand: string) {
       return commit({ ...catalog, brand }, "Website name updated.");
+    },
+
+    saveSiteImages(siteImages: SiteImageOverrides) {
+      return commit({ ...catalog, siteImages }, "Photos updated.");
     },
 
     // ----- products

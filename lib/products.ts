@@ -7,6 +7,8 @@ export type IconName = (typeof ICONS)[number];
 export type Category = {
   /** URL-safe id, e.g. "bed". Used in `?tab=` links. */
   id: string;
+  /** Optional photo for this category's tile (and the top banner while it has no products). Defaults to its first product's photo. */
+  image?: string;
   /** Long label, e.g. "Bed Designs". */
   label: string;
   /** Short name used in the navbar, e.g. "Beds". */
@@ -36,9 +38,39 @@ export type Video = {
   youtubeId: string;
 };
 
+/** Photos on the landing page that are not product photos. The owner can replace each one from the admin panel. */
+export const SITE_IMAGES = [
+  {
+    key: "lifestyleMain",
+    label: "Large photo (\u201CFurniture made to fit your home\u201D)",
+    help: "The big photo next to the \u201CCrafted around your space\u201D text. Landscape or square photos work best.",
+    alt: "Living room with a warm wooden feature wall",
+    default: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    key: "lifestyleInset",
+    label: "Small photo on top of it",
+    help: "The smaller photo that overlaps the large one (a workshop or close-up of your work works well).",
+    alt: "Carpenter working on a piece of wood in the workshop",
+    default: "https://images.unsplash.com/photo-1687422810663-c316494f725a?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    key: "ctaBackground",
+    label: "Background of \u201CCan\u2019t find your perfect design?\u201D",
+    help: "The wide photo behind the contact section near the bottom of the page. Use a darker photo so the white text stays easy to read.",
+    alt: "",
+    default: "https://images.unsplash.com/photo-1683115099191-51e617fc5ff1?auto=format&fit=crop&w=1600&q=80",
+  },
+] as const;
+export type SiteImageKey = (typeof SITE_IMAGES)[number]["key"];
+/** Only the photos the owner has replaced; the rest use the defaults above. */
+export type SiteImageOverrides = Partial<Record<SiteImageKey, string>>;
+
 export type StoredCatalog = {
   /** Increases on every save; used to detect two people editing at once. */
   rev: number;
+  /** Replacement photos for the landing-page sections (see SITE_IMAGES). */
+  siteImages?: SiteImageOverrides;
   /** The website name shown in the header, footer, page titles and WhatsApp messages. Edited in the admin panel. */
   brand: string;
   categories: Category[];
@@ -47,6 +79,8 @@ export type StoredCatalog = {
 };
 
 export type Catalog = {
+  /** Every landing-page photo, with the owner's replacements applied. */
+  siteImages: Record<SiteImageKey, string>;
   brand: string;
   categories: Category[];
   products: Product[];
@@ -55,7 +89,9 @@ export type Catalog = {
 
 export function withLabels(stored: StoredCatalog): Catalog {
   const labels = new Map(stored.categories.map((c) => [c.id, c.label]));
+  const siteImages = Object.fromEntries(SITE_IMAGES.map((s) => [s.key, stored.siteImages?.[s.key] || s.default])) as Record<SiteImageKey, string>;
   return {
+    siteImages,
     brand: stored.brand,
     categories: stored.categories,
     videos: stored.videos,

@@ -48,7 +48,7 @@ const HEAD: Record<View, { title: string; subtitle: string }> = {
   products: { title: "Products", subtitle: "Add, edit and re-order your designs" },
   categories: { title: "Categories & navigation", subtitle: "These are the tabs on your website" },
   videos: { title: "Videos", subtitle: "YouTube videos shown on your website" },
-  website: { title: "Website", subtitle: "The name shown on your website" },
+  website: { title: "Website", subtitle: "Your website name and photos" },
   account: { title: "Account", subtitle: "Change your password and set up a recovery key" },
 };
 
@@ -285,7 +285,14 @@ export default function AdminApp({
               onDelete={askDeleteCategory}
             />
           )}
-          {view === "website" && <WebsitePanel key={catalog.brand} brand={catalog.brand} saving={saving} onSave={actions.saveBrand} />}
+          {view === "website" && <WebsitePanel
+              key={`${catalog.brand}|${JSON.stringify(catalog.siteImages ?? {})}`}
+              brand={catalog.brand}
+              siteImages={catalog.siteImages ?? {}}
+              saving={saving}
+              onSave={actions.saveBrand}
+              onSaveImages={actions.saveSiteImages}
+            />}
           {view === "account" && <AccountPanel mode={mode} onSignedOut={goToLogin} notify={showToast} />}
           {view === "videos" && (
             <VideosPanel

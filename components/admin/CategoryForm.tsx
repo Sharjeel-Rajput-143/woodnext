@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { ICONS, slugify, type Category, type IconName, type StoredCatalog } from "@/lib/products";
 import { CategoryIcon } from "../Icons";
+import PhotoPicker from "./PhotoPicker";
 
 function uniqueId(base: string, taken: Set<string>): string {
   const root = slugify(base) || "category";
@@ -27,13 +28,14 @@ export default function CategoryForm({
   const [name, setName] = useState(initial?.name ?? "");
   const [label, setLabel] = useState(initial?.label ?? "");
   const [icon, setIcon] = useState<IconName>(initial?.icon ?? "tag");
+  const [image, setImage] = useState(initial?.image ?? "");
   const [error, setError] = useState("");
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     if (!name.trim() || !label.trim()) return setError("Please fill in both names.");
     const taken = new Set(catalog.categories.map((c) => c.id));
-    await onSave({ id: initial?.id ?? uniqueId(name, taken), name: name.trim(), label: label.trim(), icon });
+    await onSave({ id: initial?.id ?? uniqueId(name, taken), name: name.trim(), label: label.trim(), icon, ...(image.trim() ? { image: image.trim() } : {}) });
   }
 
   return (
@@ -80,6 +82,13 @@ export default function CategoryForm({
           ))}
         </div>
       </div>
+      <PhotoPicker
+        label="Tile photo (optional)"
+        help="Shown on this category's tile in “Shop by category”, and as the top banner while the category has no products. Leave empty to use the first product's photo."
+        value={image}
+        onChange={setImage}
+        resetLabel="Remove photo"
+      />
       {error && (
         <p className="adm-alert adm-alert-error" role="alert">
           {error}

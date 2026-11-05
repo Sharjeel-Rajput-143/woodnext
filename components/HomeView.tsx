@@ -28,10 +28,10 @@ export default function HomeView({ catalog, initialCategory }: { catalog: Catalo
         <TrustStrip />
         <CategoryTiles />
         <ProductsSection />
-        <Lifestyle />
+        <Lifestyle images={catalog.siteImages} />
         <VideoGallery />
         <HowItWorks />
-        <CtaBand />
+        <CtaBand images={catalog.siteImages} />
       </main>
       <Footer brand={catalog.brand} categories={catalog.categories} />
       <WhatsAppFab />

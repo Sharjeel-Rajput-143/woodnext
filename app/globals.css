@@ -3478,3 +3478,89 @@ button.adm-cell-main:hover strong {
   text-decoration: underline;
   opacity: 1;
 }
+
+/* ---- animated logo on the sign-in screens ---- */
+.adm-login-logo {
+  display: block;
+}
+.adm-login-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  background: #090909;
+}
+
+/* ---- admin: photo picker (website photos, category photo) ---- */
+.adm-photo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 16px 0;
+}
+.adm-photo-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.adm-photo-picker-preview {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--sand);
+  text-align: center;
+}
+.adm-photo-picker-preview img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.adm-photo-picker-tag {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.65);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.adm-photo-picker-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.adm-photo-picker-body p {
+  margin: 0;
+}
+.adm-photo-picker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.adm-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding-left: 18px;
+  list-style: disc;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+@media (max-width: 720px) {
+  .adm-photo-picker {
+    grid-template-columns: 1fr;
+  }
+}

@@ -18,7 +18,8 @@ const SWIPE_PX = 45;
 export default function Hero() {
   const { categories, products, category, select } = useShop();
   const slides = productsByCategory(products, category).slice(0, MAX_SLIDES);
-  const categoryName = categories.find((c) => c.id === category)?.label ?? "designs";
+  const activeCategory = categories.find((c) => c.id === category);
+  const categoryName = activeCategory?.label ?? "designs";
   const count = slides.length;
 
   // Index resets to the first slide whenever the category changes.
@@ -73,6 +74,12 @@ export default function Hero() {
       <div className="hero-stage">
         {slides.length === 0 && (
           <div className="slide slide-empty is-active">
+            {activeCategory?.image && (
+              <>
+                <ProductImage src={activeCategory.image} alt="" sizes="100vw" priority />
+                <div className="slide-shade" />
+              </>
+            )}
             <div className="container slide-inner">
               <div className="slide-copy">
                 <h2 className="slide-title">{categoryName}</h2>

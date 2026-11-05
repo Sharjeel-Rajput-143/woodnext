@@ -30,9 +30,9 @@ export default function CategoryTiles() {
                     scrollToProducts();
                   }}
                 >
-                  {items[0] && (
+                  {(category.image || items[0]) && (
                     <ProductImage
-                      src={items[0].image}
+                      src={category.image || items[0].image}
                       alt=""
                       sizes="(min-width: 900px) 420px, 100vw"
                     />

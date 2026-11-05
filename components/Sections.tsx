@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { photo, type Category } from "@/lib/products";
+import { SITE_IMAGES, type Category, type Catalog } from "@/lib/products";
 import { SITE } from "@/lib/site";
 import CategoryLink from "./CategoryLink";
 import { FeatureIcon, LogoMark, WhatsAppIcon, type FeatureIconName } from "./Icons";
@@ -54,15 +54,17 @@ export function TrustStrip() {
   );
 }
 
-export function Lifestyle() {
+const ALT = Object.fromEntries(SITE_IMAGES.map((i) => [i.key, i.alt])) as Record<string, string>;
+
+export function Lifestyle({ images }: { images: Catalog["siteImages"] }) {
   return (
     <section className="section section-soft">
       <div className="container lifestyle">
         <Reveal className="lifestyle-media">
           <div className="lifestyle-main">
             <Image
-              src={photo("photo-1600607687939-ce8a6c25118c")}
-              alt="Living room with a warm wooden feature wall"
+              src={images.lifestyleMain}
+              alt={ALT.lifestyleMain}
               fill
               sizes="(min-width: 900px) 560px, 100vw"
               className="media-img"
@@ -70,8 +72,8 @@ export function Lifestyle() {
           </div>
           <div className="lifestyle-inset">
             <Image
-              src={photo("photo-1687422810663-c316494f725a")}
-              alt="Carpenter working on a piece of wood in the workshop"
+              src={images.lifestyleInset}
+              alt={ALT.lifestyleInset}
               fill
               sizes="(min-width: 900px) 260px, 50vw"
               className="media-img"
@@ -124,11 +126,11 @@ export function HowItWorks() {
   );
 }
 
-export function CtaBand() {
+export function CtaBand({ images }: { images: Catalog["siteImages"] }) {
   return (
     <section className="cta-band" id="contact">
       <Image
-        src={photo("photo-1683115099191-51e617fc5ff1")}
+        src={images.ctaBackground}
         alt=""
         fill
         sizes="100vw"
